@@ -1,0 +1,8 @@
+[1] "Count"   "Score"   "Section"
+     Count           Score          Section  
+ Min.   :10.00   Min.   :200.0   Regular:19  
+ 1st Qu.:10.00   1st Qu.:300.0   Sports :19  
+ Median :10.00   Median :322.5               
+ Mean   :14.47   Mean   :317.5               
+ 3rd Qu.:20.00   3rd Qu.:357.5               
+ Max.   :30.00   Max.   :395.0               
