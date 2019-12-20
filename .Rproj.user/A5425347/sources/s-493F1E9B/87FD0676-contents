@@ -1,0 +1,44 @@
+# Assignment: ASSIGNMENT 2.1 Test Scores
+
+# Name: SAMANTA, ARINDAM
+
+# Date: 14 DECEMBER 2019
+
+# TASK 2.1
+rm(list = ls())
+
+
+scores <- read.csv("scores.csv", header = TRUE)
+attach(scores)
+
+sink("assignment_2.1_TestScores_SamantaArindam.txt")
+# 1) listing the names of the obervational units in my data set
+print(names(scores))
+
+# 2) determine which variables are categorical and which are quantitative
+# Count is quantitative
+# Score is quantitative
+# Section is categorical
+print(str(scores))
+
+# 3) variable to hold subset of the dataset that contains only Regular section
+
+regularData <- scores[Section == "Regular",]
+print(summary(regularData))
+
+# 3) variable to hold subset of the dataset that contains only Sport section
+sportsData <- subset(scores, subset = scores$Section == "Sports")
+print(summary(sportsData))
+
+sink()
+
+
+pdf("assignment_2.1_Boxplot_SamantaArindam.pdf")
+# plotting the sections vs score of #of students achieving the score
+plot(scores$Section,scores$Score,
+     main = "Section vs Scores",
+     xlab = "Section",
+     ylab = "Scores achieved by students")
+graphics.off()
+
+

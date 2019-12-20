@@ -1,38 +1,44 @@
-# Assignment: ASSIGNMENT 2.1 Test SCores
+# Assignment: ASSIGNMENT 2.1 Test Scores
 
 # Name: SAMANTA, ARINDAM
 
-# Date: 04 DECEMBER 2019
+# Date: 14 DECEMBER 2019
 
-# TASK 1. What are the observational units in this study?
+# TASK 2.1
 rm(list = ls())
-# install.packages("data.table")
-# library(data.table)
-# scores <- fread("scores.csv")
+
 
 scores <- read.csv("scores.csv", header = TRUE)
-scores$Course <- as.factor(toString(scores$Count))
 attach(scores)
 
-# sink("assignment_2.1_TestScores_SamantaArindam.txt")
-# listing the names of the obervational units in my data set
-names(scores)
+sink("assignment_2.1_TestScores_SamantaArindam.txt")
+# 1) listing the names of the obervational units in my data set
+print(names(scores))
 
-# determine which variables are categorical and which are quantitative
-str(scores)
+# 2) determine which variables are categorical and which are quantitative
+# Count is quantitative
+# Score is quantitative
+# Section is categorical
+print(str(scores))
 
-# variable to hold subset of the dataset that contains only Regular section
+# 3) variable to hold subset of the dataset that contains only Regular section
 
-regular_data <- subset(scores, subset = scores$Section == "Regular")
-summary(regular_data$Count)
+regularData <- scores[Section == "Regular",]
+print(summary(regularData))
 
-# variable to hold subset of the dataset that contains only Sport section
-sports_data <- subset(scores, subset = scores$Section == "Sports")
-sports_data
+# 3) variable to hold subset of the dataset that contains only Sport section
+sportsData <- subset(scores, subset = scores$Section == "Sports")
+print(summary(sportsData))
 
-x <- regular_data$Count
-y <- regular_data$Score
+sink()
 
-plot(x,y)
 
-# sink()
+pdf("assignment_2.1_Boxplot_SamantaArindam.pdf")
+# plotting the sections vs score of #of students achieving the score
+plot(scores$Section,scores$Score,
+     main = "Section vs Scores",
+     xlab = "Section",
+     ylab = "Scores achieved by students")
+graphics.off()
+
+
