@@ -4,7 +4,7 @@
 
 # Date: 22 DECEMBER 2019
 
-# TASK 2.1
+# TASK 3.1
 rm(list = ls())
 # Load the libraries needed
 library(ggplot2)
@@ -12,11 +12,12 @@ library(tidyr)
 library(readr)
 
 # Reading the file into a dataframe:acs
-
+# The dataset contains 
 acs <- read_csv("acs-14-1yr-s0201.csv")
 
 #2. Structure of the dataframe
 str(acs)
+
 #2. No. of observations/rows
 nrow(acs)
 
