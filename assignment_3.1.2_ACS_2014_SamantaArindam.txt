@@ -1,0 +1,8 @@
+       median          mean       SE.mean  CI.mean.0.95 
+ 8.870000e+01  8.763235e+01  4.388598e-01  8.679296e-01 
+          var       std.dev      coef.var      skewness 
+ 2.619332e+01  5.117941e+00  5.840241e-02 -1.674767e+00 
+     skew.2SE      kurtosis      kurt.2SE    normtest.W 
+-4.030254e+00  4.352856e+00  5.273885e+00  8.773635e-01 
+   normtest.p 
+ 3.193634e-09 
