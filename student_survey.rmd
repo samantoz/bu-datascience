@@ -1,0 +1,82 @@
+---
+title: "Student Survey Assignment"
+author: "Arindam Samanta"
+date: January 12 2020
+output:
+  
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Is there a significant relationship between the amount of time spent reading and the time spent watching television?
+
+### Survey data is located in "student-survey.csv"
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+## Preparations 
+
+```{r loading_packages, message = FALSE}
+library(dplyr)
+library(ggplot2)
+library(readr)
+```
+## Loading Data
+```{r loading data into dataframe, message = FALSE, echo = FALSE}
+survey_data <- read_csv("~/Github/BU-DSC/dataset/student-survey.csv")
+
+str(survey_data)
+```
+
+### Correlation Coefficient (Pearson Product moment Correlation)
+The covarience between the two variables TimeReading and TimeTV is `r survey_data %>% summarize(cor(TimeReading,TimeTV)) `
+
+The covarience between the two variables TimeReading and TimeTV in hours is `r survey_data %>% summarize(cor(TimeReading,TimeTV/60)) `
+
+The relationship is strong negative,irrespective on how we measure the variables which means that amount of time spent watching TV is negatively affecting the reading time. This could also be seen in the plot below and fitting a line.
+
+## Including Plots
+
+
+```{r survey_data, echo=FALSE}
+# Creating a scatter plot with the survey data
+plot(survey_data$TimeReading, survey_data$TimeTV/60,
+     main = "Scatter plot of Tv Time Vs Reading Time",
+     xlab = "Reading Time(hrs)",
+     ylab = "TV Time (hrs)")
+
+# Call supsmu() to generate a smooth trend curve
+trend1 <- supsmu(survey_data$TimeReading, survey_data$TimeTV/60, bass = 10)
+
+lines(trend1)
+```
+
+## Conclusion
+
+As an overall conclusion it could be said that as Reading time increases the TV time decreases overall.
+
+The below plot shows the positive strong relationship between TV Time and happiness.
+After noting down the Gender there seems to be the same relationship.
+
+``` {r survey_data1, echo=FALSE}
+# Create an empty plot
+
+plot(survey_data$TimeTV/60, survey_data$Happiness,
+     type = "n",
+     ylab = "Happiness Index",
+     xlab = "TVTime(hrs)")
+
+# Adding Point with shapes determined by happiness index
+points(survey_data$TimeTV/60, survey_data$Happiness, pch = survey_data$Gender )
+
+trend2 <- supsmu(survey_data$TimeTV/60, survey_data$Happiness, bass = 10)
+
+lines(trend2)
+#Adding Legend for the Gender
+legend("topright", pch = c(0,1),
+       legend = c("M","F"))
+```
