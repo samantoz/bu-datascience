@@ -12,7 +12,9 @@ library(tidyr)
 library(readr)
 
 # Reading the file into a dataframe:acs
-# The dataset contains 
+#1. The dataset contains American Community Survey data. It shows 1 year of data 
+# for the counties and states the High School and Bachelor's Degree as percent 
+# of the Total population
 acs <- read_csv("acs-14-1yr-s0201.csv")
 
 #2. Structure of the dataframe
