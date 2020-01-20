@@ -1,0 +1,131 @@
+---
+title: "General Society Survey Data Analysis"
+author: "Arindam Samanta"
+date: January 19 2020
+output:
+  
+  word_document: default
+---
+
+```{r setup,echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+## Part 1&2: Is there a significant relationship between the number of siblings a survey respondent has and number of his or her children?”
+
+### General Society Survey data 
+
+Data for this assignment originated from the General Society Survey (GSS). The GSS gathers data on contemporary American society in order to monitor and explain trends and constants in attitudes, behaviors, and attributes. Hundreds of trends have been tracked since 1972. In addition, since the GSS adopted questions from earlier surveys, trends can be followed for up to 70 years. Only data from the 2016 GSS survey is included in this dataset [gss2016](http://content.bellevue.edu/cst/dsc/520/id/resources/gss-2016.csv).
+
+## Preparations 
+We have used the following libraries for our regression analysis. Regression analysis is used in stats to find trends in data. For example, we are guessing  that there is a connection between how many child a respondant has and how many siblings he or she has; regression analysis can help us quantify that.
+```{r loading_packages, echo = TRUE, results='hide', warning=FALSE, message=FALSE}
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(corrplot)
+```
+## Loading data to include the SIBS,CHILDS and SEX variables from the actual data set
+As we are interested here only in the above features in our data set.
+```{r , echo=TRUE, results='hide'}
+#loading data into dataframe
+mycols <- cols_only(
+                  CHILDS = col_double(),
+                  SIBS = col_double(),
+                  SEX = col_factor()
+                  )
+wd <- getwd()
+fname <- "gss-2016.csv"
+path_to_file <- paste(wd,'/dataset/',fname, sep = "")
+path_to_file
+
+survey_data <- read_csv(path_to_file)
+
+gss2016.sub <- read_csv(path_to_file, 
+                        col_types = mycols)
+```
+For this analysis we are interested in looking at the GSS 2016 survey data, specifically the Siblings and Childs variables. 
+
+```{r }
+# looking at the first few rows
+head(gss2016.sub)
+```
+
+Summaize the data based on CHILDS to see how the distribution looks
+
+```{r}
+## Summarizing the data set by # CHILDS
+gss2016.sub %>%
+  group_by(CHILDS) %>%
+  summarize(n())
+
+```
+Summaize the data based on SIBS to see how the distribution looks
+
+```{r}
+## Summarizing the data set by # SIBLINGS
+gss2016.sub %>%
+  group_by(SIBS) %>%
+  summarize(n())
+
+```
+The summarized data shows that there are 8 rows that has Child as NA and 5 rows that has SIBS as NA.
+
+### Correlation Coefficient (Pearson Product moment Correlation)
+The covarience between the two variables SIBS and CHILD is `r gss2016.sub %>% summarize(cor(gss2016.sub$CHILDS,gss2016.sub$SIBS, use = "pairwise.complete.obs")) `
+
+The relationship shows a weak positive trend,irrespective on how we measure the variables which means that No. of siblings do not have any relationship to the number of child a respondant has. This could also be seen in the plot below and fitting a line.
+## Including Plots
+Now Construct a scatterplot of these two variables in R studio and place the best-fit linear regression line on the scatterplot. Describe the relationship between the number of siblings a respondent has (SIBS) and the number of his or her children (CHILDS).
+
+```{r , echo=TRUE, warning=FALSE, message=FALSE}
+# Creating a scatter plot with the survey data
+ggplot(data = gss2016.sub, aes(x = SIBS, y = CHILDS)) +
+  
+  geom_point(position = "jitter") +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+## Expanding the analysis to bring in the third variable
+
+Generating a scatter plot with the third variable SEX of the respondant.
+
+```{r , echo=TRUE, warning=FALSE, message=FALSE}
+# Creating a scatter plot with the third variable SEX survey data
+ggplot(data = gss2016.sub, aes(x = SIBS, y = CHILDS, color = SEX)) +
+  
+  geom_point(position = "jitter") +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+## Trying to fit a linear model
+In this model we are trying to see if the # of SIBS could predict the # of CHILD.The intercept and the slope of the model is as below. Given below is the coefficient values and summary of the model.
+
+```{r}
+# The formula for the linear model
+fmla <- CHILDS ~ SIBS
+# Fitting the formula to a model
+mod <- lm(fmla, data = gss2016.sub)
+# Coeeficient of the model
+ coef(mod)
+ summary(mod)
+```
+
+Trying to predict using the model. 
+
+```{r, echo=TRUE, results='hide'}
+# Created a new dataframe with 3 SIBS
+new_df3 <- data.frame("SIBS" = 3 )
+# Predicted no. of CHILDS
+pred3 <- predict(mod, newdata = new_df3)
+pred3
+
+# Created a new dataframe with 0 SIBS
+new_df0 <- data.frame("SIBS" = 0 )
+# Predicted no. of CHILDS
+pred0 <- predict(mod, newdata = new_df0)
+pred0
+
+```
+Predicted number of children for someone with three siblings :`r pred3`
+
+Predicted number of children for someone with no siblings :`r pred0`

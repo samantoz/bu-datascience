@@ -27,7 +27,12 @@ library(readr)
 ```
 ## Loading Data
 ```{r loading data into dataframe, message = FALSE, echo = FALSE}
-survey_data <- read_csv("~/Github/BU-DSC/dataset/student-survey.csv")
+wd <- getwd()
+fname <- "student-survey.csv"
+path_to_file <- paste(wd,'/dataset/',fname, sep = "")
+path_to_file
+
+survey_data <- read_csv(path_to_file)
 
 str(survey_data)
 ```

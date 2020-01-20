@@ -1,0 +1,152 @@
+---
+title: "Housing Data Analysis"
+author: "Arindam Samanta"
+date: January 19 2020
+output:
+  
+  word_document: default
+---
+
+```{r setup,echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Using your ‘clean’ data set from the previous week complete the following: 
+
+    Explain why you choose to remove data points from your ‘clean’ dataset.
+    Create two variables; one that will contain the variables Sale Price and Square Foot of Lot (same variables used from previous assignment on simple regression) and one that will contain Sale Price, Bedrooms, and Bath Full Count as predictors.  
+    Execute a summary() function on two variables defined in the previous step to compare the model results. What are the R2 and Adjusted R2 statistics?  Explain what these results tell you about the overall model. Did the inclusion of the additional predictors help explain any large variations found in Sale Price?
+    Considering the parameters of the multiple regression model you have created. What are the standardized betas for each parameter and what do the values indicate?
+    Calculate the confidence intervals for the parameters in your model and explain what the results indicate.
+    Assess the improvement of the new model compared to your original model (simple regression model) by testing whether this change is significant by performing an analysis of variance.
+    Perform casewise diagnostics to identify outliers and/or influential cases, storing each functions output in a dataframe assigned to a unique variable name.
+    Calculate the standardized residuals using the appropriate command, specifying those that are +-2, storing the results of large residuals in a variable you create.
+    Use the appropriate function to show the sum of large residuals.
+    Which specific variables have large residuals (only cases that evaluate as TRUE)?
+    Investigate further by calculating the leverage, cooks distance, and covariance rations. Comment on all cases that are problematics.
+    Perform the necessary calculations to assess the assumption of independence and state if the condition is met or not.
+    Perform the necessary calculations to assess the assumption of no multicollinearity and state if the condition is met or not.
+    Visually check the assumptions related to the residuals using the plot() and hist() functions. Summarize what each graph is informing you of and if any anomalies are present.
+    Overall, is this regression model unbiased?  If an unbiased regression model, what does this tell us about the sample vs. the entire population model?
+
+
+## Part 
+### Housing data 
+
+Data for this assignment is focused on real estate transactions recorded from 1964 to 2016 and can be found in Week 7 Housing.xlsx. Using your skills in statistical correlation, multiple regression and R programming, you are interested in the following variables:  Sale Price and several other possible predictors.
+
+## Preparations 
+We have used the following libraries for our regression analysis. Regression analysis is used in stats to find trends in data. For example, we are guessing  that there is a connection between how many child a respondant has and how many siblings he or she has; regression analysis can help us quantify that.
+```{r loading_packages, echo = TRUE, results='hide', warning=FALSE, message=FALSE}
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(corrplot)
+library(readxl)
+```
+## 
+As we are interested here only in the above features in our data set.
+```{r , echo=TRUE, results='hide'}
+#loading data into dataframe
+## mycols <- cols_only(
+##                  CHILDS = col_double(),
+##                  SIBS = col_double(),
+##                  SEX = col_factor()
+##                  )
+wd <- getwd()
+fname <- "week-7-housing.xlsx"
+path_to_file <- paste(wd,'/dataset/',fname, sep = "")
+path_to_file
+
+housing_data <- read_excel(path_to_file,col_names=TRUE)
+glimpse(housing_data)
+
+## gss2016.sub <- read_csv(path_to_file, 
+##                        col_types = mycols)
+```
+For this analysis we are interested in looking at the GSS 2016 survey data, specifically the Siblings and Childs variables. 
+
+```{r }
+# looking at the first few rows
+head(gss2016.sub)
+```
+
+Summaize the data based on CHILDS to see how the distribution looks
+
+```{r}
+## Summarizing the data set by # CHILDS
+gss2016.sub %>%
+  group_by(CHILDS) %>%
+  summarize(n())
+
+```
+Summaize the data based on SIBS to see how the distribution looks
+
+```{r}
+## Summarizing the data set by # SIBLINGS
+gss2016.sub %>%
+  group_by(SIBS) %>%
+  summarize(n())
+
+```
+The summarized data shows that there are 8 rows that has Child as NA and 5 rows that has SIBS as NA.
+
+### Correlation Coefficient (Pearson Product moment Correlation)
+The covarience between the two variables SIBS and CHILD is `r gss2016.sub %>% summarize(cor(gss2016.sub$CHILDS,gss2016.sub$SIBS, use = "pairwise.complete.obs")) `
+
+The relationship shows a weak positive trend,irrespective on how we measure the variables which means that No. of siblings do not have any relationship to the number of child a respondant has. This could also be seen in the plot below and fitting a line.
+## Including Plots
+Now Construct a scatterplot of these two variables in R studio and place the best-fit linear regression line on the scatterplot. Describe the relationship between the number of siblings a respondent has (SIBS) and the number of his or her children (CHILDS).
+
+```{r , echo=TRUE, warning=FALSE, message=FALSE}
+# Creating a scatter plot with the survey data
+ggplot(data = gss2016.sub, aes(x = SIBS, y = CHILDS)) +
+  
+  geom_point(position = "jitter") +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+## Expanding the analysis to bring in the third variable
+
+Generating a scatter plot with the third variable SEX of the respondant.
+
+```{r , echo=TRUE, warning=FALSE, message=FALSE}
+# Creating a scatter plot with the third variable SEX survey data
+ggplot(data = gss2016.sub, aes(x = SIBS, y = CHILDS, color = SEX)) +
+  
+  geom_point(position = "jitter") +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+## Trying to fit a linear model
+In this model we are trying to see if the # of SIBS could predict the # of CHILD.The intercept and the slope of the model is as below. Given below is the coefficient values and summary of the model.
+
+```{r}
+# The formula for the linear model
+fmla <- CHILDS ~ SIBS
+# Fitting the formula to a model
+mod <- lm(fmla, data = gss2016.sub)
+# Coeeficient of the model
+ coef(mod)
+ summary(mod)
+```
+
+Trying to predict using the model. 
+
+```{r, echo=TRUE, results='hide'}
+# Created a new dataframe with 3 SIBS
+new_df3 <- data.frame("SIBS" = 3 )
+# Predicted no. of CHILDS
+pred3 <- predict(mod, newdata = new_df3)
+pred3
+
+# Created a new dataframe with 0 SIBS
+new_df0 <- data.frame("SIBS" = 0 )
+# Predicted no. of CHILDS
+pred0 <- predict(mod, newdata = new_df0)
+pred0
+
+```
+Predicted number of children for someone with three siblings :`r pred3`
+
+Predicted number of children for someone with no siblings :`r pred0`
