@@ -31,28 +31,23 @@ Using your ‘clean’ data set from the previous week complete the following:
 
 
 ## Part 
-### Housing data 
+### Source for the Housing data 
 
 Data for this assignment is focused on real estate transactions recorded from 1964 to 2016 and can be found in Week 7 Housing.xlsx. Using your skills in statistical correlation, multiple regression and R programming, you are interested in the following variables:  Sale Price and several other possible predictors.
 
-## Preparations 
-We have used the following libraries for our regression analysis. Regression analysis is used in stats to find trends in data. For example, we are guessing  that there is a connection between how many child a respondant has and how many siblings he or she has; regression analysis can help us quantify that.
+## Data Preparations 
+We have used the following libraries for our regression analysis. Regression analysis is used in stats to find trends in data. For example, we are trying to predict the sale price of the house based on some predictors and using regression analysis can help us quantify that.
 ```{r loading_packages, echo = TRUE, results='hide', warning=FALSE, message=FALSE}
 library(dplyr)
 library(ggplot2)
-library(readr)
 library(corrplot)
 library(readxl)
 ```
 ## 
-As we are interested here only in the above features in our data set.
+Reading the excel sheet and loading the rows into a data frame. Then looking through the data using glimpse function. It shows that the sample has 12,865 observations and 24 variables. Each row represents a single house.
+That looks like a lot of variables so we would chose our variables that would be used for our prediction model and ignore the others. So essentially creating a smaller set of data with less variables.
 ```{r , echo=TRUE, results='hide'}
-#loading data into dataframe
-## mycols <- cols_only(
-##                  CHILDS = col_double(),
-##                  SIBS = col_double(),
-##                  SEX = col_factor()
-##                  )
+#populating the housing_data dataframe
 wd <- getwd()
 fname <- "week-7-housing.xlsx"
 path_to_file <- paste(wd,'/dataset/',fname, sep = "")
@@ -61,92 +56,60 @@ path_to_file
 housing_data <- read_excel(path_to_file,col_names=TRUE)
 glimpse(housing_data)
 
-## gss2016.sub <- read_csv(path_to_file, 
-##                        col_types = mycols)
+head(housing_data)
+
+#Selecting only some variables from the dataframe into our analysis dataframe set 1
+housing_data_set1 <- housing_data %>%
+  select (`Sale Price`,`Sale Date`,bath_full_count, sq_ft_lot,bedrooms)
 ```
-For this analysis we are interested in looking at the GSS 2016 survey data, specifically the Siblings and Childs variables. 
+Now we start looking at the dataset
 
 ```{r }
 # looking at the first few rows
-head(gss2016.sub)
+head(housing_data_set1)
 ```
 
-Summaize the data based on CHILDS to see how the distribution looks
+Summaize the data based on each of the columns to see how the distribution looks
 
 ```{r}
-## Summarizing the data set by # CHILDS
-gss2016.sub %>%
-  group_by(CHILDS) %>%
-  summarize(n())
+## Summarizing the data set by bath_full_count
+housing_data_set1 %>%
+  group_by(bath_full_count) %>%
+  summarize("# of houses" = n())
 
 ```
-Summaize the data based on SIBS to see how the distribution looks
+We can consider bath count to be a categorical variable. There are 8 distinct bath counts in the data set. Now lets look at the other categorical variable bedrooms.
 
 ```{r}
-## Summarizing the data set by # SIBLINGS
-gss2016.sub %>%
-  group_by(SIBS) %>%
-  summarize(n())
+## Summarizing the data set by # of bedrooms
+housing_data_set1 %>%
+  group_by(bedrooms) %>%
+  summarize("# of houses" = n())
 
 ```
-The summarized data shows that there are 8 rows that has Child as NA and 5 rows that has SIBS as NA.
+The summarized data shows that there are 12 distinct bedroom counts for the dataset.
 
-### Correlation Coefficient (Pearson Product moment Correlation)
-The covarience between the two variables SIBS and CHILD is `r gss2016.sub %>% summarize(cor(gss2016.sub$CHILDS,gss2016.sub$SIBS, use = "pairwise.complete.obs")) `
+```{r}
+## Summarizing the data set by # of bedrooms
+  summary(housing_data_set1$`Sale Price`)
 
-The relationship shows a weak positive trend,irrespective on how we measure the variables which means that No. of siblings do not have any relationship to the number of child a respondant has. This could also be seen in the plot below and fitting a line.
-## Including Plots
-Now Construct a scatterplot of these two variables in R studio and place the best-fit linear regression line on the scatterplot. Describe the relationship between the number of siblings a respondent has (SIBS) and the number of his or her children (CHILDS).
-
-```{r , echo=TRUE, warning=FALSE, message=FALSE}
-# Creating a scatter plot with the survey data
-ggplot(data = gss2016.sub, aes(x = SIBS, y = CHILDS)) +
+```
+```{r }
+# Counting the number of houses with the Min and Max sale price
+housing_data_set1 %>%
+  filter(`Sale Price` == 4400000)
   
-  geom_point(position = "jitter") +
-  geom_smooth(method = "lm", se = FALSE)
 ```
 
-## Expanding the analysis to bring in the third variable
-
-Generating a scatter plot with the third variable SEX of the respondant.
-
-```{r , echo=TRUE, warning=FALSE, message=FALSE}
-# Creating a scatter plot with the third variable SEX survey data
-ggplot(data = gss2016.sub, aes(x = SIBS, y = CHILDS, color = SEX)) +
-  
-  geom_point(position = "jitter") +
-  geom_smooth(method = "lm", se = FALSE)
-```
-
-## Trying to fit a linear model
-In this model we are trying to see if the # of SIBS could predict the # of CHILD.The intercept and the slope of the model is as below. Given below is the coefficient values and summary of the model.
+Now lets convert the bath_full_count and bedrooms to factors and create a .mod dataset
 
 ```{r}
-# The formula for the linear model
-fmla <- CHILDS ~ SIBS
-# Fitting the formula to a model
-mod <- lm(fmla, data = gss2016.sub)
-# Coeeficient of the model
- coef(mod)
- summary(mod)
+
+housing_data_set1.mod <- housing_data_set1
+
+  housing_data_set1.mod$bedrooms <- as.factor(housing_data_set1.mod$bedrooms)
+  housing_data_set1.mod$bath_full_count <- as.factor(housing_data_set1.mod$bath_full_count)
+  housing_data_set1.mod$`Sale Date` <- as.Date(housing_data_set1.mod$`Sale Date`)
+  
+  glimpse(housing_data_set1.mod)
 ```
-
-Trying to predict using the model. 
-
-```{r, echo=TRUE, results='hide'}
-# Created a new dataframe with 3 SIBS
-new_df3 <- data.frame("SIBS" = 3 )
-# Predicted no. of CHILDS
-pred3 <- predict(mod, newdata = new_df3)
-pred3
-
-# Created a new dataframe with 0 SIBS
-new_df0 <- data.frame("SIBS" = 0 )
-# Predicted no. of CHILDS
-pred0 <- predict(mod, newdata = new_df0)
-pred0
-
-```
-Predicted number of children for someone with three siblings :`r pred3`
-
-Predicted number of children for someone with no siblings :`r pred0`
