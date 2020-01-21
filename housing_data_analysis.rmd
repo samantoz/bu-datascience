@@ -113,3 +113,46 @@ housing_data_set1.mod <- housing_data_set1
   
   glimpse(housing_data_set1.mod)
 ```
+Use pairs function to measure the correlation among the variables.
+```{r}
+pairs(housing_data_set1.mod)
+```
+
+
+Use ggplot to make a scatter plot for Price as a function of Food.
+Use lm() to fit a simple linear regression model for Price as a function of Food.
+
+Use lm() to fit a parallel slopes model for Price as a function of Food and East. Interpret the coefficients and the fit of the model. Can you explain the meaning of the coefficient on East in simple terms? Did the coefficient on Food change from the previous model? If so, why? Did it change by a lot or just a little? 
+
+
+# fit model: Use lm() to fit a multiple regression model for Price as a function of Food and Service
+lm(Price ~ Food + Service, data = nyc)
+
+# draw 3D scatterplot: Use plot_ly to draw 3D scatterplot for Price as a function of Food and Service by mapping the z variable to the response and the x and y variables to the explanatory variables. Place the food quality on the x-axis and service rating on the y-axis.
+p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) %>%
+  add_markers() 
+
+# draw a plane: Use add_surface() to draw a plane through the cloud of points using the object plane.
+p %>%
+  add_surface(x = ~x, y = ~y, z = ~plane, showscale = FALSE) 
+  
+  Use lm() to fit a parallel planes model for Price as a function of Food, Service, and East.
+  
+  # Price by Food and Service and East
+lm(Price ~ Food + Service + East, data = nyc)
+
+
+Another way is to examine the impact of location in the context of the variability of the other variables. We can do this by building our parallel planes in 3D and seeing how far apart they are. Are the planes close together or far apart? Does the East variable clearly separate the data into two distinct groups? Or are the points all mixed up together?
+
+
+    Use plot_ly to draw 3D scatterplot for Price as a function of Food, Service, and East by mapping the z variable to the response and the x and y variables to the numeric explanatory variables. Use color to indicate the value of East. Place Food on the x-axis and Service on the y-axis.
+    # draw 3D scatterplot
+p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) %>%
+  add_markers(color = ~factor(East)) 
+  
+    Use add_surface() (twice) to draw two planes through the cloud of points, one for restaurants on the West side and another for restaurants on the East side. Use the objects plane0 and plane1.
+
+# draw two planes
+p %>%
+  add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) %>%
+  add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE)
