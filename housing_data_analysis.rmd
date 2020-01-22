@@ -97,8 +97,9 @@ The summarized data shows that there are 12 distinct bedroom counts for the data
 ```{r }
 # Counting the number of houses with the Min and Max sale price
 housing_data_set1 %>%
-  filter(`Sale Price` == 4400000)
-  
+  ## filter(`Sale Price` == 4400000)
+  ## filter(sq_ft_lot == 6635)
+  filter(bath_full_count == 3 & bedrooms == 5)
 ```
 
 Now lets convert the bath_full_count and bedrooms to factors and create a .mod dataset
@@ -119,10 +120,35 @@ pairs(housing_data_set1.mod)
 ```
 
 
-Use ggplot to make a scatter plot for Price as a function of Food.
-Use lm() to fit a simple linear regression model for Price as a function of Food.
+Use ggplot to make a scatter plot for Sale Price as a function of sq foot of lot size. Convert the sale price in Millions and the square footage in acres.
 
-Use lm() to fit a parallel slopes model for Price as a function of Food and East. Interpret the coefficients and the fit of the model. Can you explain the meaning of the coefficient on East in simple terms? Did the coefficient on Food change from the previous model? If so, why? Did it change by a lot or just a little? 
+```{r}
+
+ggplot(data = housing_data_set1.mod, aes(x = sq_ft_lot, y = `Sale Price`)) +
+  geom_point() +
+  labs( title = "Plotting Sale Price against Lot size",
+        x = "Lot size in sq ft",
+        y = "Price in '000s")
+
+```
+
+
+Use lm() to fit a simple linear regression model for Price as a function of Lot size.
+
+```{r}
+var1 <- lm(`Sale Price` ~ sq_ft_lot, data = housing_data_set1.mod)
+summary(var1)
+
+predict(var1, data.frame(sq_ft_lot = 6635))
+```
+Using lm() to fit a multiple regression model with 2 new predictors like bedrooms and bath_full_count
+
+```{r}
+var2 <- lm(`Sale Price` ~ as.numeric(bedrooms) + as.numeric(bath_full_count), data = housing_data_set1.mod)
+summary(var2)
+predict(var2, data.frame(bedrooms = 5, bath_full_count = 3))
+```
+ Use lm() to fit a parallel slopes model for Price as a function of Food and East. Interpret the coefficients and the fit of the model. Can you explain the meaning of the coefficient on East in simple terms? Did the coefficient on Food change from the previous model? If so, why? Did it change by a lot or just a little? 
 
 
 # fit model: Use lm() to fit a multiple regression model for Price as a function of Food and Service
@@ -156,3 +182,8 @@ p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) %>%
 p %>%
   add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) %>%
   add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE)
+  
+  
+  Use lm() to fit a parallel planes model for Price as a function of Food, Service, Decor, and East.
+
+Notice the dramatic change in the value of the Service coefficient. 
