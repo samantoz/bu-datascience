@@ -11,31 +11,11 @@ output:
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-Using your ‘clean’ data set from the previous week complete the following: 
-
-    Explain why you choose to remove data points from your ‘clean’ dataset.
-    Create two variables; one that will contain the variables Sale Price and Square Foot of Lot (same variables used from previous assignment on simple regression) and one that will contain Sale Price, Bedrooms, and Bath Full Count as predictors.  
-    Execute a summary() function on two variables defined in the previous step to compare the model results. What are the R2 and Adjusted R2 statistics?  Explain what these results tell you about the overall model. Did the inclusion of the additional predictors help explain any large variations found in Sale Price?
-    Considering the parameters of the multiple regression model you have created. What are the standardized betas for each parameter and what do the values indicate?
-    Calculate the confidence intervals for the parameters in your model and explain what the results indicate.
-    Assess the improvement of the new model compared to your original model (simple regression model) by testing whether this change is significant by performing an analysis of variance.
-    Perform casewise diagnostics to identify outliers and/or influential cases, storing each functions output in a dataframe assigned to a unique variable name.
-    Calculate the standardized residuals using the appropriate command, specifying those that are +-2, storing the results of large residuals in a variable you create.
-    Use the appropriate function to show the sum of large residuals.
-    Which specific variables have large residuals (only cases that evaluate as TRUE)?
-    Investigate further by calculating the leverage, cooks distance, and covariance rations. Comment on all cases that are problematics.
-    Perform the necessary calculations to assess the assumption of independence and state if the condition is met or not.
-    Perform the necessary calculations to assess the assumption of no multicollinearity and state if the condition is met or not.
-    Visually check the assumptions related to the residuals using the plot() and hist() functions. Summarize what each graph is informing you of and if any anomalies are present.
-    Overall, is this regression model unbiased?  If an unbiased regression model, what does this tell us about the sample vs. the entire population model?
-
-
-## Part 
 ### Source for the Housing data 
 
-Data for this assignment is focused on real estate transactions recorded from 1964 to 2016 and can be found in Week 7 Housing.xlsx. Using your skills in statistical correlation, multiple regression and R programming, you are interested in the following variables:  Sale Price and several other possible predictors.
+Data for this assignment is focused on real estate transactions recorded from 1964 to 2016 and can be found in Week 7 Housing.xlsx. For statistical correlation, multiple regression and R programming, I am interested in the following set of variables.
 
-## Data Preparations 
+#### Loading the required libraries for our analysis
 We have used the following libraries for our regression analysis. Regression analysis is used in stats to find trends in data. For example, we are trying to predict the sale price of the house based on some predictors and using regression analysis can help us quantify that.
 ```{r loading_packages, echo = TRUE, results='hide', warning=FALSE, message=FALSE}
 library(dplyr)
@@ -43,7 +23,7 @@ library(ggplot2)
 library(corrplot)
 library(readxl)
 ```
-## 
+### a) Explain why you choose to remove data points from your ‘clean’ dataset.
 Reading the excel sheet and loading the rows into a data frame. Then looking through the data using glimpse function. It shows that the sample has 12,865 observations and 24 variables. Each row represents a single house.
 That looks like a lot of variables so we would chose our variables that would be used for our prediction model and ignore the others. So essentially creating a smaller set of data with less variables.
 ```{r , echo=TRUE, results='hide'}
@@ -61,74 +41,34 @@ head(housing_data)
 #Selecting only some variables from the dataframe into our analysis dataframe set 1
 housing_data_set1 <- housing_data %>%
   select (`Sale Price`,`Sale Date`,bath_full_count, sq_ft_lot,bedrooms)
-```
-Now we start looking at the dataset
 
-```{r }
-# looking at the first few rows
 head(housing_data_set1)
 ```
 
-Summaize the data based on each of the columns to see how the distribution looks
-
-```{r}
-## Summarizing the data set by bath_full_count
-housing_data_set1 %>%
-  group_by(bath_full_count) %>%
-  summarize("# of houses" = n())
-
-```
-We can consider bath count to be a categorical variable. There are 8 distinct bath counts in the data set. Now lets look at the other categorical variable bedrooms.
-
-```{r}
-## Summarizing the data set by # of bedrooms
-housing_data_set1 %>%
-  group_by(bedrooms) %>%
-  summarize("# of houses" = n())
-
-```
-The summarized data shows that there are 12 distinct bedroom counts for the dataset.
-
-```{r}
-## Summarizing the data set by # of bedrooms
-  summary(housing_data_set1$`Sale Price`)
-
-```
-```{r }
-# Counting the number of houses with the Min and Max sale price
-housing_data_set1 %>%
-  ## filter(`Sale Price` == 4400000)
-  ## filter(sq_ft_lot == 6635)
-  filter(bath_full_count == 3 & bedrooms == 5)
-```
-
-Now lets convert the bath_full_count and bedrooms to factors and create a .mod dataset
-
-```{r}
-
-housing_data_set1.mod <- housing_data_set1
-
-  housing_data_set1.mod$bedrooms <- as.factor(housing_data_set1.mod$bedrooms)
-  housing_data_set1.mod$bath_full_count <- as.factor(housing_data_set1.mod$bath_full_count)
-  housing_data_set1.mod$`Sale Date` <- as.Date(housing_data_set1.mod$`Sale Date`)
-  
-  glimpse(housing_data_set1.mod)
-```
 Use pairs function to measure the correlation among the variables.
 ```{r}
-pairs(housing_data_set1.mod)
+pairs(housing_data_set1)
 ```
+```{r}
+ggplot(housing_data_set1, aes (x = `Sale Price`)) +
+  geom_histogram(binwidth = 10000) +
+  labs(x = "Sale Price")
 
+## housing_data_set1 %>%
+##  filter(housing_data_set1$`Sale Price` > 1000000) %>%
+## summarize(n())
+```
+### b) Create two variables; one that will contain the variables Sale Price and Square Foot of Lot (same variables used from previous assignment on simple regression) and one that will contain Sale Price, Bedrooms, and Bath Full Count as predictors.  
 
-Use ggplot to make a scatter plot for Sale Price as a function of sq foot of lot size. Convert the sale price in Millions and the square footage in acres.
+The first variable var1 would be the simple linear model.Using ggplot we are trying to make a scatter plot for Sale Price as a function of sq foot of lot size.
 
 ```{r}
 
-ggplot(data = housing_data_set1.mod, aes(x = sq_ft_lot, y = `Sale Price`)) +
+ggplot(data = housing_data_set1, aes(x = sq_ft_lot, y = `Sale Price`)) +
   geom_point() +
   labs( title = "Plotting Sale Price against Lot size",
         x = "Lot size in sq ft",
-        y = "Price in '000s")
+        y = "Sale Price")
 
 ```
 
@@ -136,54 +76,55 @@ ggplot(data = housing_data_set1.mod, aes(x = sq_ft_lot, y = `Sale Price`)) +
 Use lm() to fit a simple linear regression model for Price as a function of Lot size.
 
 ```{r}
-var1 <- lm(`Sale Price` ~ sq_ft_lot, data = housing_data_set1.mod)
-summary(var1)
+var1 <- lm(`Sale Price` ~ sq_ft_lot, data = housing_data_set1)
 
-predict(var1, data.frame(sq_ft_lot = 6635))
 ```
-Using lm() to fit a multiple regression model with 2 new predictors like bedrooms and bath_full_count
+Again using lm() to fit a multiple regression model with 2 new predictors like bedrooms and bath_full_count. This is the second variable var2. We are trying to predict sale price as a function of both bath_full_count and Bedrooms.
 
 ```{r}
-var2 <- lm(`Sale Price` ~ as.numeric(bedrooms) + as.numeric(bath_full_count), data = housing_data_set1.mod)
-summary(var2)
-predict(var2, data.frame(bedrooms = 5, bath_full_count = 3))
+var2 <- lm(`Sale Price` ~ bedrooms + bath_full_count, data = housing_data_set1)
+
 ```
- Use lm() to fit a parallel slopes model for Price as a function of Food and East. Interpret the coefficients and the fit of the model. Can you explain the meaning of the coefficient on East in simple terms? Did the coefficient on Food change from the previous model? If so, why? Did it change by a lot or just a little? 
+ 
+### c) Execute a summary() function on two variables defined in the previous step to compare the model results. What are the R2 and Adjusted R2 statistics?  Explain what these results tell you about the overall model. Did the inclusion of the additional predictors help explain any large variations found in Sale Price?
 
+```{r, Model 1 and Model 2}
+summary(var1)
 
-# fit model: Use lm() to fit a multiple regression model for Price as a function of Food and Service
-lm(Price ~ Food + Service, data = nyc)
+## predict(var1, data.frame(sq_ft_lot = 6635))
 
-# draw 3D scatterplot: Use plot_ly to draw 3D scatterplot for Price as a function of Food and Service by mapping the z variable to the response and the x and y variables to the explanatory variables. Place the food quality on the x-axis and service rating on the y-axis.
-p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) %>%
-  add_markers() 
+summary(var2)
+## predict(var2, data.frame(bedrooms = 5, bath_full_count = 3))
+``` 
 
-# draw a plane: Use add_surface() to draw a plane through the cloud of points using the object plane.
-p %>%
-  add_surface(x = ~x, y = ~y, z = ~plane, showscale = FALSE) 
-  
-  Use lm() to fit a parallel planes model for Price as a function of Food, Service, and East.
-  
-  # Price by Food and Service and East
-lm(Price ~ Food + Service + East, data = nyc)
+R-square measures the percentage of the variability in the response variable that is explained by the model. 
+For the above two models Var1 has R-Square = 0.014 and Var2 has it 0.102. Increase in R-square is due to adding  additional variable to my var2 model.
+For the above two models Var1 has Adj. R-Square = 0.014 and Var2 has it 0.102. But the increase in the Adj R-square shows that with the addition of the 2 new predictors they are better able to predict the sale price in the Var2 model.
 
+```{r, loading library QuantPsyc for the Beta values}
+library(QuantPsyc)
 
-Another way is to examine the impact of location in the context of the variability of the other variables. We can do this by building our parallel planes in 3D and seeing how far apart they are. Are the planes close together or far apart? Does the East variable clearly separate the data into two distinct groups? Or are the points all mixed up together?
+lm.beta(var2)
 
+```
+### d) Considering the parameters of the multiple regression model you have created. What are the standardized betas for each parameter and what do the values indicate?
+From the output of the Var2 we get the parameter values for the multiple regression model. So 70,566 is the paramter for the # of bedrooms and 148058 is for the bath_full_count. These values indicate the individual contribution of each predictor to the model.It also tells us that both the predictors are positively related to the sale price.
+paramter for bedrooms = 70566 indicates that if the number of bedrooms increases by 1 unit the sale price of the house increases by $70566. Similarly increase of full bath by 1 unit increases the sale price by $148058.
+The Standardized beta values (bedroom = 0.153, bath_full_count = 0.238) provide a better insight into the importance of a predictor in the model.
 
-    Use plot_ly to draw 3D scatterplot for Price as a function of Food, Service, and East by mapping the z variable to the response and the x and y variables to the numeric explanatory variables. Use color to indicate the value of East. Place Food on the x-axis and Service on the y-axis.
-    # draw 3D scatterplot
-p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) %>%
-  add_markers(color = ~factor(East)) 
-  
-    Use add_surface() (twice) to draw two planes through the cloud of points, one for restaurants on the West side and another for restaurants on the East side. Use the objects plane0 and plane1.
-
-# draw two planes
-p %>%
-  add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) %>%
-  add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE)
-  
-  
-  Use lm() to fit a parallel planes model for Price as a function of Food, Service, Decor, and East.
-
-Notice the dramatic change in the value of the Service coefficient. 
+### e) Calculate the confidence intervals for the parameters in your model and explain what the results indicate.
+### f) Assess the improvement of the new model compared to your original model (simple regression model) by testing whether this change is significant by performing an analysis of variance.
+ 
+### g) Perform casewise diagnostics to identify outliers and/or influential cases, storing each functions output in a dataframe assigned to a unique variable name.
+### h) Calculate the standardized residuals using the appropriate command, specifying those that are +-2, storing the results of large residuals in a variable you create.
+### i) Use the appropriate function to show the sum of large residuals.
+### j) Which specific variables have large residuals (only cases that evaluate as TRUE)?
+### k) Investigate further by calculating the leverage, cooks distance, and covariance rations. Comment on all cases that are problematics.
+### l)Perform the necessary calculations to assess the assumption of independence and state if the condition is met or not.
+### m) Perform the necessary calculations to assess the assumption of no multicollinearity and state if the condition is met or not.
+### n) Visually check the assumptions related to the residuals using the plot() and hist() functions. Summarize what each graph is informing you of and if any anomalies are present.
+### o) Overall, is this regression model unbiased?  If an unbiased regression model, what does this tell us about the sample vs. the entire population model?
+ 
+ 
+ 
+ 
