@@ -1,7 +1,7 @@
 ---
 title: "Housing Data Analysis"
 author: "Arindam Samanta"
-date: January 19 2020
+date: January 26 2020
 output:
   
   word_document: default
@@ -13,10 +13,10 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ### Source for the Housing data 
 
-Data for this assignment is focused on real estate transactions recorded from 1964 to 2016 and can be found in Week 7 Housing.xlsx. For statistical correlation, multiple regression and R programming, I am interested in the following set of variables.
+Data for this assignment is focused on real estate transactions recorded from 1964 to 2016 and can be found in Week 7 Housing.xlsx. For statistical correlation, multiple regression and R programming, I am interested in some of the variables which have been included in the below code.
 
 #### Loading the required libraries for our analysis
-We have used the following libraries for our regression analysis. Regression analysis is used in stats to find trends in data. For example, we are trying to predict the sale price of the house based on some predictors and using regression analysis can help us quantify that.
+We have used the following libraries overall for our regression analysis. Regression analysis is used in stats to find trends in data. For example, we are trying to predict the sale price of the house based on some predictors and using regression analysis can help us quantify that.
 ```{r loading_packages, echo = TRUE, results='hide', warning=FALSE, message=FALSE}
 library(dplyr)
 library(ggplot2)
@@ -25,7 +25,7 @@ library(readxl)
 ```
 ### a) Explain why you choose to remove data points from your ‘clean’ dataset.
 Reading the excel sheet and loading the rows into a data frame. Then looking through the data using glimpse function. It shows that the sample has 12,865 observations and 24 variables. Each row represents a single house.
-That looks like a lot of variables so we would chose our variables that would be used for our prediction model and ignore the others. So essentially creating a smaller set of data with less variables.
+That looks like a lot of variables so we would chose our variables that would be used for our prediction model and ignore the others. So essentially creating a smaller set of data with less variables. We are removing the other features from the data set so that we do not make our model overfit and so removing the unwanted data points.
 ```{r , echo=TRUE, results='hide'}
 #populating the housing_data dataframe
 wd <- getwd()
@@ -39,28 +39,14 @@ glimpse(housing_data)
 head(housing_data)
 
 #Selecting only some variables from the dataframe into our analysis dataframe set 1
-housing_data_set1 <- housing_data %>%
-  select (`Sale Price`,`Sale Date`,bath_full_count, sq_ft_lot,bedrooms)
+housing_data_set1 <- housing_data %>% dplyr::select(`Sale Price`,bedrooms,bath_full_count,sq_ft_lot)
 
 head(housing_data_set1)
 ```
 
-Use pairs function to measure the correlation among the variables.
-```{r}
-pairs(housing_data_set1)
-```
-```{r}
-ggplot(housing_data_set1, aes (x = `Sale Price`)) +
-  geom_histogram(binwidth = 10000) +
-  labs(x = "Sale Price")
-
-## housing_data_set1 %>%
-##  filter(housing_data_set1$`Sale Price` > 1000000) %>%
-## summarize(n())
-```
 ### b) Create two variables; one that will contain the variables Sale Price and Square Foot of Lot (same variables used from previous assignment on simple regression) and one that will contain Sale Price, Bedrooms, and Bath Full Count as predictors.  
 
-The first variable var1 would be the simple linear model.Using ggplot we are trying to make a scatter plot for Sale Price as a function of sq foot of lot size.
+The first variable named var1 would be representing a simple linear regression model.Using ggplot we are trying to make a scatter plot for Sale Price as a function of sq foot of lot size. This is done in order to visualize the dataset.
 
 ```{r}
 
@@ -71,12 +57,22 @@ ggplot(data = housing_data_set1, aes(x = sq_ft_lot, y = `Sale Price`)) +
         y = "Sale Price")
 
 ```
-
+It shows that the data is fairly concentrated towards the lower end of the lot size.
 
 Use lm() to fit a simple linear regression model for Price as a function of Lot size.
 
 ```{r}
 var1 <- lm(`Sale Price` ~ sq_ft_lot, data = housing_data_set1)
+
+```
+The second variable is using multiple linear regression using 2 predictors, bedrooms and and bath room full counts. Plotting them in a scatter plot looks like as below.
+
+```{r}
+ggplot(data = housing_data_set1, aes(x = bedrooms, y = `Sale Price`, color = as.factor(bath_full_count))) +
+  geom_point() + geom_jitter() +
+  labs( title = "Plotting Sale Price against # of bedrooms",
+        x = "No. Of Bedrooms",
+        y = "Sale Price")
 
 ```
 Again using lm() to fit a multiple regression model with 2 new predictors like bedrooms and bath_full_count. This is the second variable var2. We are trying to predict sale price as a function of both bath_full_count and Bedrooms.
@@ -114,15 +110,124 @@ The Standardized beta values (bedroom = 0.153, bath_full_count = 0.238) provide 
 
 ### e) Calculate the confidence intervals for the parameters in your model and explain what the results indicate.
 ### f) Assess the improvement of the new model compared to your original model (simple regression model) by testing whether this change is significant by performing an analysis of variance.
- 
+```{r, calculating ANOVA}
+anova(var1, var2)
+
+```
+We see from the above ANOVA table that the second model Var2 has F value of 1260.8 with a very small value of Pr(>F) is 2.2e -16 (i.e., 2.2 with decimal place moved 16 places to the left.) Thus we can say that Var2 significantly improved the fit of the model to the data compared to the simple regression model Var1.
+
+
 ### g) Perform casewise diagnostics to identify outliers and/or influential cases, storing each functions output in a dataframe assigned to a unique variable name.
+In order to answer the question of whether our multiple regression model(Var2) fits the observed data well, or if it is influenced by a small number of cases, we can look for outliers and influential cases. We are using the augment function on the var2 model from the broom package to generate a new data frame housing_data_set1.augment storing the variables for the casewise diagnostics. 
+To identify Outliers we would need Residuals and standardized residuals. These are stored in our dataframe as .resid and .std.resid
+To identify Influential cases: Cooks distance, hat values for leverage are used.These values are stored in .hat and .cooksd columns.
+
+```{r}
+library(broom)
+housing_data_set1.augment <- augment(var2)
+## Adding the covariance ratio to the augmented data frame
+housing_data_set1.augment$cov.ratios <- covratio(var2)
+
+head(housing_data_set1.augment)
+```
+
 ### h) Calculate the standardized residuals using the appropriate command, specifying those that are +-2, storing the results of large residuals in a variable you create.
 ### i) Use the appropriate function to show the sum of large residuals.
+
+
+It is expected that in an ordinary sample we would expect 95% of cases to have standardized residuals (.std.resid) within about +2 and -2. Here we have a sample of 12,865 so it is reasonable to expect about (643) to have standardized residuals outside these limits.
+
+```{r}
+# lets create a new variable large.resid to store the lasrge residuals
+housing_data_set1.augment$large.residual <- housing_data_set1.augment$.std.resid > 2 | housing_data_set1.augment$.std.resid < -2
+
+
+
+# head(housing_data_set1.augment)
+# sum of the large residuals
+sum(housing_data_set1.augment$large.residual)
+```
 ### j) Which specific variables have large residuals (only cases that evaluate as TRUE)?
-### k) Investigate further by calculating the leverage, cooks distance, and covariance rations. Comment on all cases that are problematics.
+creating a new data frame to store those cases which are outside our 95% range.
+```{r}
+housing_data.large_resid <- housing_data_set1.augment %>%
+                                  dplyr::select(Sale.Price, bedrooms,bath_full_count,.std.resid,large.residual) %>%
+                                  dplyr::filter(large.residual == TRUE)
+                              
+
+housing_data.large_resid
+```
+
+
+
+### k) Investigate further by calculating the leverage, cooks distance, and covariance ratios. Comment on all cases that are problematics.
+Let us now look at the leverage (hat value), cook's distance and covariance ratio for these 334 for these large residual cases
+```{r}
+housing_data.lev <- housing_data_set1.augment %>%
+                                  dplyr::select(Sale.Price, bedrooms,bath_full_count,.hat,.cooksd,cov.ratios,large.residual) %>%
+                                  dplyr::filter(large.residual == TRUE)
+                              
+# showing rows with Cook's distance > 1
+housing_data.lev %>%
+  filter(.cooksd > 1)
+
+# showing rows with leverage > .0006
+housing_data.lev %>%
+  filter(.hat > .0006)
+
+# showing rows with cov ratio > 1.0006 & < .9994
+housing_data.lev %>%
+  filter(cov.ratios > 1.0006 | cov.ratios < .9994)
+
+```
+Executing the command prints the variables but only for the cases for which large.residual = TRUE. 
+The above output shows that the observation for the house with sale price of $270,000 and having a bath count of 23 only has a cook's distance > 1 so it would have an undue influence on the model.
+The average leverage is (2+1)/12865 = .0002. Now looking for values Greater than (2*.0002 = .0004) or .0006 comes back with 
+44 rows
+The CVR value upper limit is 1.0006 and the lower limit is .9994. Now taking data from the third table shows that there are 287 rows that could be problematic as they have the leverage outside of the limit.(> 1.0006 or < 0.9994)
+
 ### l)Perform the necessary calculations to assess the assumption of independence and state if the condition is met or not.
+
+We can test the assumption of independent errors using the Durbin-Watson test.
+
+```{r, Durbin Watson Test}
+library(lmtest)
+ dwtest(var2)
+
+```
+Here the test shows that DW is < 1 with a p value of very small. So this model is a cause for concern.
+
 ### m) Perform the necessary calculations to assess the assumption of no multicollinearity and state if the condition is met or not.
+
+## ```{r}
+## library(VIF)
+## vif(var2)
+## ```
 ### n) Visually check the assumptions related to the residuals using the plot() and hist() functions. Summarize what each graph is informing you of and if any anomalies are present.
+```{r}
+# head(housing_data_set1.augment)
+
+histogram <- ggplot(housing_data_set1.augment, aes(.std.resid)) + 
+    # opts(legend.position = "none") + 
+    geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+    labs(x = "Standardized Residual", y = "Density")
+
+histogram + 
+  stat_function(fun = dnorm, args = list(mean = mean(housing_data_set1.augment$.std.resid, na.rm = TRUE), 
+          sd = sd(housing_data_set1.augment$.std.resid, na.rm = TRUE)), colour = "red", size = 1)
+```
+The above plot shows the histogram of standardized residuals.
+Let us now draw the Scatter plot of standardized residuals against predicted values.
+```{r}
+# head(housing_data_set1.augment)
+
+scatter <- ggplot(housing_data_set1.augment, aes(x = .fitted, y= .std.resid))
+scatter + geom_point() + 
+    geom_smooth(method = "lm", colour = "Blue") + 
+    labs(x = "FittedValues", y = "Standardized Residual")
+```
+
+
 ### o) Overall, is this regression model unbiased?  If an unbiased regression model, what does this tell us about the sample vs. the entire population model?
  
  
