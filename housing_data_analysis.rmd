@@ -75,7 +75,7 @@ ggplot(data = housing_data_set1, aes(x = bedrooms, y = `Sale Price`, color = as.
         y = "Sale Price")
 
 ```
-Again using lm() to fit a multiple regression model with 2 new predictors like bedrooms and bath_full_count. This is the second variable var2. We are trying to predict sale price as a function of both bath_full_count and Bedrooms.
+Again using lm() to fit a multiple regression model var2 with 2 new predictors like bedrooms and bath_full_count. This is the second variable var2. We are trying to predict sale price as a function of both bath_full_count and Bedrooms.
 
 ```{r}
 var2 <- lm(`Sale Price` ~ bedrooms + bath_full_count, data = housing_data_set1)
@@ -199,11 +199,15 @@ Here the test shows that DW is < 1 with a p value of very small. So this model i
 
 ### m) Perform the necessary calculations to assess the assumption of no multicollinearity and state if the condition is met or not.
 
-## ```{r}
-## library(VIF)
-## vif(var2)
-## ```
-### n) Visually check the assumptions related to the residuals using the plot() and hist() functions. Summarize what each graph is informing you of and if any anomalies are present.
+```{r}
+library(car)
+vif1 <- car::vif(var2)
+tolerance <- 1/vif1
+vif1
+tolerance
+```
+The VIF and tolerance statistics are useful statistics to assess collinarity. For our current model the VIF values for both the variables are all well below 10 and the tolerance statistics all well above 0.2. Based on these measures we can safely conclude that there is no collinearity within our data.
+### n) Visually check the assumptions related to the residuals using the plot() and hist() functions. Summarize what each graph is informing you of and if any anomalies are present. 
 ```{r}
 # head(housing_data_set1.augment)
 
@@ -226,10 +230,21 @@ scatter + geom_point() +
     geom_smooth(method = "lm", colour = "Blue") + 
     labs(x = "FittedValues", y = "Standardized Residual")
 ```
+```{r}
+plot(var2)
 
+```
+From the above Residuals vs Fitted plot it shows that the scatter points are not random and rather concentrated towards the positive values for the residuals. Hence the data shows a non linear relationship.
+The QQ plot shows deviation from linearity. The normal distribution shown by the stariaght line do not have all the points over it so it shows skewness of the data towards the higher end of the model.
 
+```{r}
+## head(housing_data_set1.augment)
+
+hist(housing_data_set1.augment$.std.resid)
+```
+The histogram for the data is roughly skewed to the right as it does not have a bell-curve shape.
 ### o) Overall, is this regression model unbiased?  If an unbiased regression model, what does this tell us about the sample vs. the entire population model?
- 
+So overall this regression model is not unbiased. It is not a perfectly good model for the data as it has outliers,influential cases, etc.and so we cannot use that model to draw conclusions about our sample. We cannot generalize your findings beyond your sample to the entire population.
  
  
  
