@@ -1,0 +1,88 @@
+---
+title: "8.1 Thorasic Surgery Binary Data Set"
+author: "Arindam Samanta"
+date: February 02 2020
+output:
+  
+  word_document: default
+---
+
+```{r setup,echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+### Source for the Data 
+
+The data was collected retrospectively at Wroclaw Thoracic Surgery Centre for patients who underwent major lung resections for primary lung cancer in the years 2007â€“2011. The Centre is associated with the Department of Thoracic Surgery of the Medical University of Wroclaw and Lower-Silesian Centre for Pulmonary Diseases, Poland, while the research database constitutes a part of the National Lung Cancer Registry, administered by the Institute of Tuberculosis and Pulmonary Diseases in Warsaw, Poland.
+
+#### Loading the required libraries for our analysis
+
+```{r loading_packages, echo = TRUE, results='hide', warning=FALSE, message=FALSE}
+library(foreign)
+library(ggplot2)
+library(dplyr)
+```
+
+```{r , echo=TRUE, results='hide'}
+#populating the housing_data dataframe
+wd <- getwd()
+fname <- "ThoraricSurgery.arff"
+path_to_file <- paste(wd,'/dataset/',fname, sep = "")
+path_to_file
+
+my_init_df <- read.arff(path_to_file)
+glimpse(my_init_df)
+
+summary(my_init_df)
+
+head(my_init_df)
+```
+The data set has 470 observations and 17 predictors out of which the binary response variable Risk1Yr, shows 1 year survival period(T if died). The predictor variables constitutes both continuous and binary.
+
+a.  Fit a binary logistic regression model to the data set that predicts whether or not the patient survived for one year (the Risk1Y variable) after the surgery. Use the glm() function to perform the logistic regression. See Generalized Linear Models for an example. Include a summary using the summary() function in your results.
+The code below estimates a logistic regression model using the glm(generalized linear model) function. The model uses all the predictors for the model.
+
+```{r}
+# Building the dataframe for analysis
+survive <- my_init_df
+survive$Risk1Yr <- ifelse(survive$Risk1Yr=="T",1,0)
+survive$Risk1Yr <- as.factor(survive$Risk1Yr)
+summary(survive)
+# load library
+library(broom)
+
+# Applying the glm function for the logistic regression
+survive_m <- glm(Risk1Yr ~., data = survive, family = binomial(link = "logit"))
+
+summary(survive_m)
+
+# Using tidy function from the broom package
+out_survive_m <- tidy(survive_m)
+
+# Looking for the snapshot of the output of the model
+
+## out_survive_m
+
+#Ordering the output based on the p value
+
+out_survive_m[order(out_survive_m$estimate, decreasing = TRUE),]
+```
+
+b. According to the summary, which variables had the greatest effect on the survival rate? 
+Both summary and tidy function have been applied to the model. As per the output it seems Diagnosis 8 has the greatest effect on survival as it shows from the estimate the log odds of survival than any other diagnosis by 18.032.  
+
+c. To compute the accuracy of your model, use the dataset to predict the outcome variable. The percent of correct predictions is the accuracy of your model. What is the accuracy of your model?
+
+Now using the regression model survive_m we are trying to predict the outcome from the data set. 
+```{r}
+# augment(survive_m)
+
+pred <- predict(survive_m, newdata = survive, type ="response")
+
+table(survive$Risk1Yr, pred)
+## library(InformationValue)
+## optCutOff <- optimalCutoff()
+
+## confusionMatrix(survive$Risk1Yr, pred, threshold = optCutOff)
+
+```

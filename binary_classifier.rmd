@@ -1,0 +1,100 @@
+---
+title: "8.2 Logistic Regression vs Nearest Neighbour"
+author: "Arindam Samanta"
+date: February 02 2020
+output:
+  
+  word_document: default
+---
+
+```{r setup,echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+### Source for the Data 
+
+
+#### Loading the required libraries for our analysis
+
+```{r loading_packages, echo = TRUE, results='hide', warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+```
+There are 1498 observations and 3 variables. Out of which the variable label is binary having 0 and 1 as the output. The other 2 variables are x and y.
+```{r , echo=TRUE, results='hide'}
+#populating the housing_data dataframe
+wd <- getwd()
+fname <- "binary-classifier-data.csv"
+path_to_file <- paste(wd,'/dataset/',fname, sep = "")
+path_to_file
+
+my_init_df <- read.csv(path_to_file, header = TRUE)
+
+summary(my_init_df)
+
+head(my_init_df)
+```
+Plotting the data to visualize the relationship between the variables. Converting the label variable into factor as it has only two values. The plot shows that the values do not show any relationship.
+
+```{r}
+# Creating a new data frame from the initial dataframe
+binary_data <- my_init_df
+
+my_plot <- ggplot(data = binary_data, aes(x = x, y = y, col = as.factor(label)))
+
+my_plot <- my_plot + geom_point()
+
+my_plot <- my_plot + xlab("X") + ylab("Y") + scale_color_discrete(name = "Label")
+
+my_plot
+
+```
+
+a. What is the accuracy of the logistic regression classifier?
+
+Data splicing basically involves splitting the data set into training and testing data set.
+
+```{r}
+#random selection of 70% data.
+set.seed(123)
+dat.d <- sample(1:nrow(binary_data),size=nrow(binary_data)*0.7,replace = FALSE) 
+ 
+train.binary_data <- binary_data[dat.d,] # 70% training data
+test.binary_data <- binary_data[-dat.d,] # remaining 30% test data
+dim(train.binary_data)
+dim(test.binary_data)
+```
+
+Fit a logistic regression model with the binary-classifier-data.csv dataset from the previous assignment.
+Fitting a logictic regression model using the training data set.
+
+```{r}
+
+train.binary_data.glm <- glm(label ~ x + y, data = train.binary_data, family = binomial)
+
+summary(train.binary_data.glm)
+
+```
+In order to get the accuracy of the logistic regression we need to build the confusion matrix. To compute the confusion matrix, we need to have a set of predictions so that they can be compared to the actual targets.
+
+b. How does the accuracy of the logistic regression classifier compare to the nearest neighbors algorithm?
+
+The binary data has 2 labels and 0 and 1 and it is predicted using x and y predictors. So building a kmeans clustering with k = 2 by removing the labels from the data frame.
+
+```{r}
+
+km_binary_data.df <- select(binary_data, x,y)
+
+# Grouping the new data frame into 2 clusters: km_binary_data
+
+km_binary_data <- kmeans(km_binary_data.df, 2)
+
+#visualizing the cluster using plot
+
+plot(km_binary_data.df, col = km_binary_data$cluster)
+
+km_binary_data$centers
+
+```
+
+c. Why is the accuracy of the logistic regression classifier different from that of the nearest neighbors?
