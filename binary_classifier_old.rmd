@@ -76,6 +76,7 @@ summary(train.binary_data.glm)
 
 ```
 In order to get the accuracy of the logistic regression we need to build the confusion matrix. To compute the confusion matrix, we need to have a set of predictions so that they can be compared to the actual targets.
+
 ```{r}
 
 pred <- predict(train.binary_data.glm, newdata = test.binary_data, type = "response")
@@ -85,7 +86,7 @@ table_matrix <- table(test.binary_data$label, pred > 0.5)
 table_matrix
 
 ```
-In the above prediction model prediction type = "response", indicates to compute the response probability. In order to compute the confusion matrix, predict>0.5 means it returns 1 if the predicted probabilities are above 0.5, else 0.
+In the above prediction type = "response", indicates to compute the response probability. In order to compute the confusion matrix, predict>0.5 means it returns 1 if the predicted probabilities are above 0.5, else 0.
 
 Now each row in a confusion matrix represents an actual target, while each column represents a predicted target. The model accuracy can be calculated by summing the TP+TN over the total observations.
 
@@ -99,80 +100,20 @@ The model shows an accuracy of around 54%. So not a good classifier.
 
 b. How does the accuracy of the logistic regression classifier compare to the nearest neighbors algorithm?
 
-The binary data has 2 labels and 0 and 1 and it is predicted using x and y predictors. So now building a k NN clustering with k = 2 by removing the labels from the data frame.
-
-```{r}
-# Before we start the K Nearest Neighbor algorithm we need to remove the outcome variable from the Train and test data sets
-# Storing the label column from the Train and Test Set as Train_label and Test_label
-
-train_label <- train.binary_data$label
-test_label <- test.binary_data$label
-
-# Copy the Train and Test Dataset as knn_train and knn_test
-knn_train <- train.binary_data
-knn_test <- test.binary_data
-
-# Drop the label column from the knn data sets
-knn_train$label <- NULL
-knn_test$label <- NULL
-
-# Now use knn() from the class package
-library(class)
-
-# use knn() to predict the values of the test set based on 5 neighbors.
-# It needs 4 arguments cl: factor of true class labels of the training set
-set.seed(1)
-
-pred <- knn(train = knn_train, test = knn_test, cl = train_label, k = 5)
-
-# Construct the Confusion matrix making Test_labels as rows
-
-conf <- table(test_label, pred)
-conf
-
-accuracy_knn <- sum(diag(conf)) / sum(conf)
-
-accuracy_knn
-
-```
-So the accuracy of the K Nearest neighbor model is 98% while that of the logistic regression was 54%.
-
-As it is a big issue with k-Nearest Neighbors is the choice of a suitable k. How many neighbors should you use to decide on the label of a new observation? But the below method proves that our choice of K=5 is appropriate.
+The binary data has 2 labels and 0 and 1 and it is predicted using x and y predictors. So building a kmeans clustering with k = 2 by removing the labels from the data frame.
 
 ```{r}
 
-set.seed(1)
+# Grouping the new data frame into 2 clusters: km_binary_data
 
-# Create range, a vector of K values to try and accs vector to store the accuracies for these different values
+km_binary_data <- kmeans(binary_data, 2)
 
-range <- 1:round(0.2 * nrow(knn_train))
-accs <- rep(0, length(range))
+#visualizing the cluster using plot
 
-df <- for (k in range) {
-  pred <- knn(train = knn_train, test = knn_test, cl = train_label, k = k)
-  conf <- table(test_label, pred)
-  # Derive the accuracy and assign it to the correct index in accs
-  accs[k] <- sum(diag(conf)) / sum(conf)
-}
+ggplot(data = binary_data,aes(y = y, x = x,col = as.factor(km_binary_data$cluster))) + geom_point() + xlab("X") + ylab("Y") + scale_color_discrete(name = "Label")
 
-# Plot the accuracies. Title of x-axis is "k".
-
-ggplot(data = df, aes(x = range, y = accs)) + geom_point() 
-
-## plot(range, accs, xlab = "k")
-
-
-which.max(accs)
+km_binary_data$centers
 
 ```
-
-
-b. How does the accuracy of the logistic regression classifier compare to the nearest neighbors algorithm?
-
-KNN is a non parametric model while Logistic Regression is a parametric model. So in KNN there are no parameters to be defined.
-Because of the way this data was distributed there was no linear relationship between the predictors and the outcome. Hence the outcome of the logistic regression classifier was much less accurate than the K nearest neighbor.
-
-
 
 c. Why is the accuracy of the logistic regression classifier different from that of the nearest neighbors?
-When we plotted the data it showed that there were no linear or non liner relationship between the X and Y predictor variables rather they showed some type of clustering features. So the K Nearest neighbor was able to predict the outcomes more accurately than the logistic model.

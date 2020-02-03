@@ -79,10 +79,15 @@ Now using the regression model survive_m we are trying to predict the outcome fr
 
 pred <- predict(survive_m, newdata = survive, type ="response")
 
-table(survive$Risk1Yr, pred)
-## library(InformationValue)
-## optCutOff <- optimalCutoff()
+table_matrix <- table(survive$Risk1Yr, pred > 0.5)
 
-## confusionMatrix(survive$Risk1Yr, pred, threshold = optCutOff)
+table_matrix
+
+accuracy_test_glm <- sum(diag(table_matrix)) / sum(table_matrix)
+accuracy_test_glm
 
 ```
+In the above prediction type = "response", indicates to compute the response probability. In order to compute the confusion matrix, predict>0.5 means it returns 1 if the predicted probabilities are above 0.5, else 0.
+Now each row in a confusion matrix represents an actual target, while each column represents a predicted target. The model accuracy can be calculated by summing the TP+TN over the total observations.
+
+The accuracy of the model shows here as 83%.
