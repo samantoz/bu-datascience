@@ -1,0 +1,81 @@
+---
+Name: "Arindam Samanta"
+Date: February 02 2020
+Title: "<TBD>"
+output:
+  
+  word_document: default
+---
+
+```{r setup,echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+Example : https://towardsdatascience.com/random-forest-in-r-f66adf80ec9
+
+
+# Section 1: Getting Started
+## Introduction
+World Health Organization has estimated 12 million deaths occur worldwide, every year due to Heart diseases. Half the deaths in the United States and other developed countries are due to cardio vascular diseases. The early prognosis of cardiovascular diseases can aid in making decisions on lifestyle changes in high risk patients and in turn reduce the complications. This analysis intends to pinpoint the most relevant/risk factors of heart disease as well as predict the overall risk using logistic regression and random forest algorithms.
+
+## Research question
+We would like to do Exploratory Data Analysis on the data to get an understanding of the different features and how they are related to one another. We would also look at the variables and see if they are related to one another.We are trying to build a classification problem to answer our main question about the chances of having a heart disease.
+
+1) What are the chances of having a heart disease based on the Vital data collected from a patient?
+2) What is the most significant predictor for a Heart disease?
+3) Is their a correlation between Age and Sex with the chances of having a heart disease?
+4) Is there a possibility that based on the analysis of the vital data if we could prevent a possible heart failure from happening?
+5) 
+
+## Approach
+I am planning to use Logistic Regression algorithm using glm and random forest in order to do a comparison to the output. The random forest algorithm works by aggregating the predictions made by multiple decision trees. I would be using bootstrapped dataset created from the original dataset.
+
+## How my approach addresses (fully or partially) the problem
+When the random forest is used for classification and is presented with a new sample, the final prediction is made by taking the majority of the predictions made by each individual decision tree in the forest. In the event, it is used for regression and it is presented with a new sample, the final prediction is made by taking the average of the predictions made by each individual decision tree in the forest.
+
+## Data
+I have looked into various sources for this dataset that could be helpful in predicting the possible heart failure for an individual based on patient data that are collected for each of the patients on a regular checkup.
+Finally the below dataset was found to be most suitable. It was available in kaggle also.
+
+Link to the dataset: https://archive.ics.uci.edu/ml/datasets/Heart+Disease
+
+This dataset integrates all the databases present in Heart Disease Dataset available at UCI Machine Learning Repository. Original one contains 4 databases: Cleveland, Hungarian, Long Beach, and Switzerland. Most of the work has been done using Cleveland dataset only.
+   The authors of the databases have requested:
+
+      ...that any publications resulting from the use of the data include the 
+      names of the principal investigator responsible for the data collection
+      at each institution.  They would be:
+
+       1. Hungarian Institute of Cardiology. Budapest: Andras Janosi, M.D.
+       2. University Hospital, Zurich, Switzerland: William Steinbrunn, M.D.
+       3. University Hospital, Basel, Switzerland: Matthias Pfisterer, M.D.
+       4. V.A. Medical Center, Long Beach and Cleveland Clinic Foundation:
+	  Robert Detrano, M.D., Ph.D.
+
+## Required Packages
+
+I am planning to use the following packages to start with and some more might be needed as I start the work:
+package : tidyr
+package : dplyr
+package : ggplot2
+package : broom
+package : randomForest
+package : caTools
+
+## Plots and Table
+
+Tables:
+Showing the first few rwos of the data set
+
+Plot:
+scatter plot showing the distribution of the important features
+3-d plot if needed for the data
+histogram
+
+
+## Questions for future steps
+
+As a starting point I would like to answer the following questions:
+1) What is the distribution of the data for the important features?
+2) How does the features have there values normalized or do they have biases?
+3) Is there any collinearity between the variables/features?
+4) What are most imporatnt features from the list of all the features available in the dataset?

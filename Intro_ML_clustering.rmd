@@ -1,0 +1,89 @@
+---
+title: "9.3 Clustering"
+author: "Arindam Samanta"
+date: February 09 2020
+output:
+  
+  word_document: default
+---
+
+```{r setup,echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+### Source for the Data 
+
+
+#### Loading the required libraries for our analysis
+
+```{r loading_packages, echo = TRUE, results='hide', warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+```
+There are 4022 observations and 2 variables. The other 2 variables are x and y.
+```{r , echo=TRUE, results='hide'}
+#populating the data file to dataframe
+wd <- getwd()
+fname <- "clustering-data.csv"
+path_to_file <- paste(wd,'/dataset/',fname, sep = "")
+path_to_file
+
+my_clusterdf <- read.csv(path_to_file, header = TRUE)
+
+summary(my_clusterdf)
+head(my_clusterdf)
+str(my_clusterdf)
+
+```
+### a) Plot the data for each data set using a scatter plot.
+Plotting the data to visualize the relationship between the variables. The plot shows that the values do not show any relationship.
+
+```{r}
+# Creating a new data frame from the initial binary dataframe
+cluster_data <- my_clusterdf
+
+my_plot <- ggplot(data = cluster_data, aes(x = x, y = y))
+my_plot <- my_plot + geom_point() 
+my_plot <- my_plot + xlab("X") + ylab("Y")
+my_plot
+
+```
+
+### b) Fit the dataset using the k-means algorithm from  k=2 to k=12. Create a scatter plot of the resultant clusters for each value of k.
+To start with fit a k-means model to cluster_data using the center k = 2 to 12. Then create scatter plot for each cluster. 
+
+
+```{r}
+# Set up a 3X4 plotting grid
+par(mfrow = c(3,4))
+
+# Initialize total within ss: wss for the elbow chart
+wss <- 0
+# For 2 to 12 cluster centers
+for(i in 2:12) {
+  km.out <- kmeans(cluster_data, centers = i, nstart = 20)
+  
+# Plot clusters
+  plot(cluster_data, col = km.out$cluster,
+       main = paste("No. of cluster",i),
+       xlab = paste("Within SS :",round(km.out$tot.withinss)), ylab = "")
+# save total within ss errors to wss variable
+  wss[i] <- km.out$tot.withinss
+  }
+
+```
+
+### c. Calculate this average distance from the center of each cluster for each value of k and plot it as a line chart where k is the x-axis and the average distance is the y-axis.
+
+```{r}
+
+#Plot total within ss vs No. of clusters
+
+plot(2:12, wss[2:12], type = "b",
+     xlab = "Number of clusters",
+     ylab = "Within Group SS")
+
+```
+
+### d. Looking at the graph you generated in the previous example, what is the elbow point for this dataset? 
+The elbow point looks like when k = 6

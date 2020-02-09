@@ -1,0 +1,125 @@
+---
+title: "9.2 Introduction to Machine Learning"
+author: "Arindam Samanta"
+date: February 09 2020
+output:
+  
+  word_document: default
+---
+
+```{r setup,echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+### Source for the Data 
+
+
+#### Loading the required libraries for our analysis
+
+```{r loading_packages, echo = TRUE, results='hide', warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+```
+There are 1498 observations and 3 variables. Out of which the variable label is binary having 0 and 1 as the output. The other 2 variables are x and y.
+```{r , echo=TRUE, results='hide'}
+#populating the binary classifier file to dataframe
+wd <- getwd()
+fname1 <- "binary-classifier-data.csv"
+path_to_file <- paste(wd,'/dataset/',fname1, sep = "")
+path_to_file
+
+my_init_bindf <- read.csv(path_to_file, header = TRUE)
+
+fname2 <- "trinary-classifier-data.csv"
+path_to_file <- paste(wd,'/dataset/',fname2, sep = "")
+path_to_file
+
+my_init_tridf <- read.csv(path_to_file,header = TRUE)
+#Details of the binary dataset
+
+summary(my_init_bindf)
+head(my_init_bindf)
+str(my_init_bindf)
+
+#Details of the trinary dataset
+
+summary(my_init_tridf)
+head(my_init_tridf)
+str(my_init_tridf)
+
+```
+### Plot the data for each data set using a scatter plot.
+Plotting the data to visualize the relationship between the variables. Converting the label variable into factor as it has only two values. The plot shows that the values do not show any relationship.
+
+```{r}
+# Creating a new data frame from the initial binary dataframe
+binary_data <- my_init_bindf
+
+my_plot <- ggplot(data = binary_data, aes(x = x, y = y, col = as.factor(label)))
+my_plot <- my_plot + geom_point()
+my_plot <- my_plot + xlab("X") + ylab("Y") + scale_color_discrete(name = "Label")
+my_plot
+
+# Creating a new data frame from the initial trinary dataframe
+trinary_data <- my_init_tridf
+
+my_plot <- ggplot(data = trinary_data, aes(x = x, y = y, col = as.factor(label)))
+my_plot <- my_plot + geom_point()
+my_plot <- my_plot + xlab("X") + ylab("Y") + scale_color_discrete(name = "Label")
+my_plot
+
+
+```
+
+### Fit a k nearest neighbors model for each dataset for k=3, k=5, k=10, k=15, k=20, and k=25. Compute the accuracy of the resulting models for each value of k. Plot the results in a graph where the x-axis is the different values of k and the y-axis is the accuracy of the model.
+
+Data splicing basically involves splitting the data set into training and testing data set.
+
+```{r}
+#random selection of 70% data.
+set.seed(123)
+dat.d <- sample(1:nrow(binary_data),size=nrow(binary_data)*0.7,replace = FALSE) 
+ 
+train.binary_data <- binary_data[dat.d,] # 70% training data
+test.binary_data <- binary_data[-dat.d,] # remaining 30% test data
+dim(train.binary_data)
+dim(test.binary_data)
+```
+
+The binary data has 2 labels and 0 and 1 and it is predicted using x and y predictors. So now building a k NN clustering with k = 2 by removing the labels from the data frame.
+
+```{r}
+# Before we start the K Nearest Neighbor algorithm we need to remove the outcome variable from the Train and test data sets
+# Storing the label column from the Train and Test Set as Train_label and Test_label
+
+train_label <- train.binary_data$label
+test_label <- test.binary_data$label
+
+# Copy the Train and Test Dataset as knn_train and knn_test
+knn_train <- train.binary_data
+knn_test <- test.binary_data
+
+# Drop the label column from the knn data sets
+knn_train$label <- NULL
+knn_test$label <- NULL
+
+# Now use knn() from the class package
+library(class)
+
+# use knn() to predict the values of the test set based on 5 neighbors.
+# It needs 4 arguments cl: factor of true class labels of the training set
+set.seed(1)
+
+pred <- knn(train = knn_train, test = knn_test, cl = train_label, k = 5)
+
+# Construct the Confusion matrix making Test_labels as rows
+
+conf <- table(test_label, pred)
+conf
+
+accuracy_knn <- sum(diag(conf)) / sum(conf)
+
+accuracy_knn
+
+```
+So the accuracy of the K Nearest neighbor model is 98%.
