@@ -148,12 +148,17 @@ set.seed(1)
 range <- 1:round(0.2 * nrow(knn_train))
 accs <- rep(0, length(range))
 
+## range
+## accs
+
 df <- for (k in range) {
   pred <- knn(train = knn_train, test = knn_test, cl = train_label, k = k)
   conf <- table(test_label, pred)
   # Derive the accuracy and assign it to the correct index in accs
   accs[k] <- sum(diag(conf)) / sum(conf)
 }
+
+## head(df)
 
 # Plot the accuracies. Title of x-axis is "k".
 

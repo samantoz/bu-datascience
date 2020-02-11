@@ -11,9 +11,6 @@ output:
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-### Source for the Data 
-
-
 #### Loading the required libraries for our analysis
 
 ```{r loading_packages, echo = TRUE, results='hide', warning=FALSE, message=FALSE}
