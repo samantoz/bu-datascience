@@ -92,8 +92,10 @@ library(broom)
 library(randomForest)
 
 ```
-## How to import and clean my data
-### About the source data
+# Q1: Data importing and cleaning steps are explained in the text and in the DataCamp exercises.(Tell me why you are doing the data cleaning activities that you perform). Follow a logical process.
+
+## Explaining the steps on how to import and clean my data
+### A brief overview about the source data
 The actual database contains 76 attributes, but all published experiments refer to using a subset of 14 of them.  In particular, the Cleveland database is the only one that has been used by ML researchers to this date. But we would be using all the other datasets also. The "goal" field refers to the presence of heart disease in the patient.  It is integer valued from 0 (no presence) to 4. Experiments with the Cleveland database have concentrated on simply attempting to distinguish presence (values 1,2,3,4) from absence (value 0).  
    
 The names and social security numbers of the patients were removed from the database, replaced with dummy values. We are using all four processed files which also exist in the dataset directory.
@@ -133,15 +135,17 @@ The names and social security numbers of the patients were removed from the data
                                 diagnosis of heart disease (angiographic disease status)
                                  0: < 50% diameter narrowing (No heart disease)
                                  1: > 50% diameter narrowing ( Yes Heart disease)
+### Explanation for why clean up is necessary
 
-I would start by importing each of the 4 files which have already being processed, into 4 different data frames and looking at those separately in order to get a better understanding of the values of the attributes and how they are distributed. 
+Before we apply any algorithm on our data, it is obvious that the data should be tidy or structured. But in the real world, the data mostly we initially see is unstructured. So in order to make it tidy and to further apply any algorithm to derive the insights, data has to be cleaned. The major reason why the data is not tidy is because of the presence of missing values and outliers. So as a first step I would start by importing each of the 4 files which have already being processed, into 4 different data frames and looking at those separately in order to get a better understanding of the values of the attributes and how they are distributed. 
+
 
 ```{r , echo=TRUE, results='hide', message=FALSE, warning=FALSE}
 #populating the cleveland file into dataframe
 wd <- getwd()
 cleveland_f <- "processed.cleveland.data"
 path_to_file <- paste(wd,'/dataset/',cleveland_f, sep = "")
-path_to_file
+## path_to_file
 
 cleveland_df <- read.csv(path_to_file, header = FALSE)
 ## dim(cleveland_df)
@@ -151,7 +155,7 @@ cleveland_df <- read.csv(path_to_file, header = FALSE)
 #populating the Hungarian file into dataframe
 hungarian_f <- "processed.hungarian.data"
 path_to_file <- paste(wd,'/dataset/',hungarian_f, sep = "")
-path_to_file
+## path_to_file
 
 hungarian_df <- read.csv(path_to_file, header = FALSE)
 ## dim(hungarian_df)
@@ -161,7 +165,7 @@ hungarian_df <- read.csv(path_to_file, header = FALSE)
 #populating the Switzerland file into dataframe
 switzerland_f <- "processed.switzerland.data"
 path_to_file <- paste(wd,'/dataset/',switzerland_f, sep = "")
-path_to_file
+## path_to_file
 
 switzerland_df <- read.csv(path_to_file, header = FALSE)
 ## dim(switzerland_df)
@@ -171,7 +175,7 @@ switzerland_df <- read.csv(path_to_file, header = FALSE)
 #populating the Long Beach, CA data file into dataframe
 long_beach_f <- "processed.va.data"
 path_to_file <- paste(wd,'/dataset/',long_beach_f, sep = "")
-path_to_file
+## path_to_file
 
 long_beach_df <- read.csv(path_to_file, header = FALSE)
 ## dim(long_beach_df)
@@ -263,16 +267,21 @@ data1[ data1 == "?"] <- NA
 colSums(is.na(data1))
 
 ```
-Let us have a look at those rows and see if we could find anything interesting in those rows.
+Let us have a look at those 6 rows and see if we could find anything interesting in those rows.
 
 ```{r , echo=TRUE, results='hide', message=FALSE, warning=FALSE}
 data1 %>% filter(is.na(ca) | is.na(thal))
 ```
 Now as we are not experts in this type of data let us take these 6 rows out from the cleveland dataset.Now looking at the new cleaner dataset we see there are no missing records now and the count of the dataset is 303 - 6 = 296.
+This is only being done on the Cleveland dataset as that seems to be missing the least number of variables. We would use this dataset set separately as our final data set for prediction purposes.
+
 ```{r , echo=TRUE, results='hide', message=FALSE, warning=FALSE}
-data11 <- data1 %>% filter(!is.na(ca)) %>% filter(!is.na(thal))
+data11 <- data1 %>% filter(!is.na(ca)) %>%  filter(!is.na(thal))
 colSums(is.na(data11))
 
+# Recasting the above 2 columns as factor shows the summary info correctly
+data11$ca <- factor(data11$ca)
+data11$thal <- factor(data11$thal)
 summary(data11)
 ```
 ### Repeating the same above processes on the remaining dataset and coming up with a clean/tidy dataset
@@ -371,37 +380,30 @@ colSums(is.na(data4))
 ```
 
 
-data2$out[data2$out > 1] <- 1
-summary(data2)
-
-data3$out[data3$out > 1] <- 1
-summary(data3)
-
-data4$out[data4$out > 1] <- 1
-summary(data4)
-
-```
-
-data1 %>% group_by(out) %>% summarise(n())
-
-# stacking the dataframes together now
+### stacking the dataframes together now. 
+This is a combined data set with all the 4 datasets combined into one big dataset.But after looking at the various data sets it became clear that except for the Cleveland dataset all others do have a lot of missing data for some of the variables. 
+Showing the summary on the combined dataset it looks like that the dataset from Long Beach VA and Swiss has a significantly higher number of outcomes that shows more patients having heart disease(out = 1) than without (out = 0). 
+```{r , echo=TRUE, results='hide', message=FALSE, warning=FALSE}
 combined.data <- rbind(data1,data2,data3,data4)
 
 combined.data %>% group_by(datasrc,out) %>% summarise(n())
-
-head(combined.data)
+## glimpse(combined.data)
+## head(combined.data)
+colSums(is.na(combined.data))
 ```
 ## What does the final data set look like
 With a clean dataset, show what the final data set looks like. However, do not print off a data frame with 200+ rows; show me the data in the most condensed form possible.
-    What do you not know how to do right now that you need to learn to import and cleanup your dataset?
-    Discuss how you plan to uncover new information in the data that is not self-ent to answer?
-    Do you plan to slice and dice the data in different ways, create new variables, or join separate data frames to create new summary information? Explain.
-    How could you summarize your data to answer key questions?vident.
-    What are different ways you could look at this data to answer the questions you wa
-    What types of plots and tables will help you to illustrate the findings to your questions? Ensure that all graph plots have axis titles, legend if necessary, scales are appropriate, appropriate geoms used, etc.).
-    
+So after doing the initial round of Exploratory Data Analysis, I am planning on using the Clean and Tidy Cleveland data set for my predictions. I will name it the final_data. The summary detail is shown below. This dataset do not have any missing values or outliers.
+```{r , echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+final_data <- data11
 
-
+glimpse(final_data)
+colSums(is.na(final_data))
+summary(final_data)
+```
 ## Questions for future step
     What do you not know how to do right now that you need to learn to answer your questions?
+    I do not know confidently how to manage datasets having missing values for some of the variables. I am planning on learning that for my next steps. 
+    
     Do you plan on incorporating any machine learning techniques to answer your research questions? Explain.
+    I am planning on applying random forest model for this classification problem along with the Generalized Linear Model and see the effectiveness of each models prediction.
