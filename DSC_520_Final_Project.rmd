@@ -10,7 +10,7 @@ output:
 ```{r setup,echo=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
-Example : https://towardsdatascience.com/random-forest-in-r-f66adf80ec9
+
 
 
 # Section 1: Getting Started
@@ -107,40 +107,44 @@ The names and social security numbers of the patients were removed from the data
         Switzerland: 123
       Long Beach VA: 200
 
-### Attribute Information: The attributes that are defined in the below datasets are defined here. It also shows the position of the attributes in the actual files.
-   -- Only 14 used
-      -- V1. #3  (age)       : Age in years    
-      -- V2. #4  (sex)       : sex (1 = male; 0 = female)
-      -- V3. #9  (cp)        : chest pain type (1:typical angina, 2:atypical angina,
+### Attribute Information: The attributes that are defined in the below datasets are defined here. 
+
+It also shows the position of the attributes in the actual files:
+   Only 14 used:
+       V1. #3  (age)       : Age in years    
+       V2. #4  (sex)       : sex (1 = male; 0 = female)
+       V3. #9  (cp)        : chest pain type (1:typical angina, 2:atypical angina,
                                                 3:non-anginal pain, 4: asymptomatic)
-      -- V4. #10 (trestbps)  : resting blood pressure (in mm Hg on admission to the hospital)
-      -- V5. #12 (chol)      : serum cholestoral in mg/dl
-      -- V6. #16 (fbs)       : (fasting blood sugar > 120 mg/dl)  (1 = true; 0 = false)
-      -- V7. #19 (restecg)   : resting electrocardiographic results 
+       V4. #10 (trestbps)  : resting blood pressure (in mm Hg on admission to the hospital)
+       V5. #12 (chol)      : serum cholestoral in mg/dl
+       V6. #16 (fbs)       : (fasting blood sugar > 120 mg/dl)  (1 = true; 0 = false)
+       V7. #19 (restecg)   : resting electrocardiographic results 
                                 0: normal, 
                                 1: having ST-T wave abnormality (T wave inversions and/or ST 
                                                       elevation or depression of > 0.05 mV)
                                 2: showing probable or definite left ventricular hypertrophy
                                                       by Estes' criteria
-      -- V8. #32 (thalach)   : maximum heart rate achieved
-      -- V9. #38 (exang)     : exercise induced angina (1 = yes; 0 = no)
-      -- V10. #40 (oldpeak)  : ST depression induced by exercise relative to rest  
-      -- V11. #41 (slope)    : the slope of the peak exercise ST segment
+       V8. #32 (thalach)   : maximum heart rate achieved
+       V9. #38 (exang)     : exercise induced angina (1 = yes; 0 = no)
+       V10. #40 (oldpeak)  : ST depression induced by exercise relative to rest  
+       V11. #41 (slope)    : the slope of the peak exercise ST segment
                                 1: upsloping
                                 2: flat
                                 3: downsloping
-      -- V12. #44 (ca)       : number of major vessels (0-3) colored by flourosopy 
-      -- V13. #51 (thal)     : 3 = normal; 6 = fixed defect; 7 = reversable defect  
-      -- V14. #58 (num)      : the predicted attribute
+       V12. #44 (ca)       : number of major vessels (0-3) colored by flourosopy 
+       V13. #51 (thal)     : 3 = normal; 6 = fixed defect; 7 = reversable defect  
+       V14. #58 (num)      : the predicted attribute
                                 diagnosis of heart disease (angiographic disease status)
                                  0: < 50% diameter narrowing (No heart disease)
                                  1: > 50% diameter narrowing ( Yes Heart disease)
+
 ### Explanation for why clean up is necessary
 
 Before we apply any algorithm on our data, it is obvious that the data should be tidy or structured. But in the real world, the data mostly we initially see is unstructured. So in order to make it tidy and to further apply any algorithm to derive the insights, data has to be cleaned. The major reason why the data is not tidy is because of the presence of missing values and outliers. So as a first step I would start by importing each of the 4 files which have already being processed, into 4 different data frames and looking at those separately in order to get a better understanding of the values of the attributes and how they are distributed. 
 
+### Given below is the detailed step-by-step process of cleaning the data. 
 
-```{r , echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r , echo=TRUE, results='asis', message=FALSE, warning=FALSE}
 #populating the cleveland file into dataframe
 wd <- getwd()
 cleveland_f <- "processed.cleveland.data"
@@ -200,7 +204,7 @@ data.va <- long_beach_df
 ```
 
 ### Adding the new columns for each of the data source name. 
-Also adding an extra variable to keep the Source name along with the data set. Now looking at the data briefly.
+Also adding an extra variable to keep the Source name along with the data set. Now looking at the data briefly. This would help in the model building phase after I combine all the datasets.
 ```{r , echo=TRUE, results='hide', message=FALSE, warning=FALSE}
 names(data.cle) <- c("age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal", "out")
 names(data.hun) <- c("age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal", "out")
@@ -234,7 +238,7 @@ glimpse(data1)
 
 ```
 We see that the data set is showing mean for categorical variables also. Hence we need to re-specify the column types. We know a categorical variable (a variable that takes on a finite amount of values) is a factor. As we can see, sex is incorrectly treated as a number when in reality it can only be 1 if male and 0 if female. We can use the transform method to change the in built type of each feature.
-```{r , echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r , echo=TRUE, results='markup', message=FALSE, warning=FALSE}
 
 data1 <- transform(
   data1,
@@ -262,20 +266,20 @@ ca       : number of major vessels (0-3) colored by flourosopy
 thal     : 3 = normal; 6 = fixed defect; 7 = reversable defect  
 Now after replacing the missing values ("?") with NA we can use the colSums function to count the number of missing values. It shows that we have 4 and 2 rows with missing values for thal and ca respectively. 
 
-```{r , echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r , echo=TRUE, results='asis', message=FALSE, warning=FALSE}
 data1[ data1 == "?"] <- NA
 colSums(is.na(data1))
 
 ```
 Let us have a look at those 6 rows and see if we could find anything interesting in those rows.
 
-```{r , echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r , echo=TRUE, results='asis', message=FALSE, warning=FALSE}
 data1 %>% filter(is.na(ca) | is.na(thal))
 ```
 Now as we are not experts in this type of data let us take these 6 rows out from the cleveland dataset.Now looking at the new cleaner dataset we see there are no missing records now and the count of the dataset is 303 - 6 = 296.
 This is only being done on the Cleveland dataset as that seems to be missing the least number of variables. We would use this dataset set separately as our final data set for prediction purposes.
 
-```{r , echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r , echo=TRUE, results='markup', message=FALSE, warning=FALSE}
 data11 <- data1 %>% filter(!is.na(ca)) %>%  filter(!is.na(thal))
 colSums(is.na(data11))
 
@@ -380,7 +384,7 @@ colSums(is.na(data4))
 ```
 
 
-### stacking the dataframes together now. 
+### Combining the dataframes together now. 
 This is a combined data set with all the 4 datasets combined into one big dataset.But after looking at the various data sets it became clear that except for the Cleveland dataset all others do have a lot of missing data for some of the variables. 
 Showing the summary on the combined dataset it looks like that the dataset from Long Beach VA and Swiss has a significantly higher number of outcomes that shows more patients having heart disease(out = 1) than without (out = 0). 
 ```{r , echo=TRUE, results='hide', message=FALSE, warning=FALSE}
@@ -394,7 +398,7 @@ colSums(is.na(combined.data))
 ## What does the final data set look like
 With a clean dataset, show what the final data set looks like. However, do not print off a data frame with 200+ rows; show me the data in the most condensed form possible.
 So after doing the initial round of Exploratory Data Analysis, I am planning on using the Clean and Tidy Cleveland data set for my predictions. I will name it the final_data. The summary detail is shown below. This dataset do not have any missing values or outliers.
-```{r , echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+```{r , echo=TRUE, results='markup', message=FALSE, warning=FALSE}
 final_data <- data11
 
 glimpse(final_data)
@@ -403,7 +407,9 @@ summary(final_data)
 ```
 ## Questions for future step
     What do you not know how to do right now that you need to learn to answer your questions?
-    I do not know confidently how to manage datasets having missing values for some of the variables. I am planning on learning that for my next steps. 
+    I do not know confidently how to manage datasets having missing values for some of the variables. I am planning on learning that for my next steps. So as of now I am planning on using the Cleveland data set as that is mostly complete and so would help in the model building.
     
     Do you plan on incorporating any machine learning techniques to answer your research questions? Explain.
-    I am planning on applying random forest model for this classification problem along with the Generalized Linear Model and see the effectiveness of each models prediction.
+    I am planning on applying random forest model for this classification problem along with the Generalized Linear Model and see the effectiveness of each models prediction. 
+    Also before I apply any machine learning techniques I am planning on visualizing the dataset using scatter plots for some of the variables.(e.g, age,sex and some others) 
+    Also I would like to find the correlation and test between the various predictor variables.
