@@ -1,7 +1,7 @@
 ---
 Name: "Arindam Samanta"
-Date: February 02 2020
-Title: "<TBD>"
+Date: February 27 2020
+Title: "Prediction of Heart Disease based on Health Data"
 output:
   
   word_document: default
@@ -18,13 +18,13 @@ knitr::opts_chunk$set(echo = FALSE)
 World Health Organization has estimated 12 million deaths occur worldwide, every year due to Heart diseases. Half the deaths in the United States and other developed countries are due to cardio vascular diseases. The early prognosis of cardiovascular diseases can aid in making decisions on lifestyle changes in high risk patients and in turn reduce the complications. This analysis intends to pinpoint the most relevant/risk factors of heart disease as well as predict the overall risk using logistic regression and random forest algorithms.
 
 ## Research question
-We would like to do Exploratory Data Analysis on the data to get an understanding of the different features and how they are related to one another. We would also look at the variables and see if they are related to one another.We are trying to build a classification problem to answer our main question about the chances of having a heart disease.
+We would like to do Exploratory Data Analysis on the data to get an understanding of the different features and how they are related to one another. We would also look at the variables and see if they are related to one another.As part of this exercise we are trying to build a classification problem to answer our main question about the chances of having a heart disease based on the various medical prognosis and tests.
 
-1) What are the chances of having a heart disease based on the Vital data collected from a patient?
+1) What are the chances of having a heart disease based on the Vital data collected from a sample of patients of different age group and occupation?
 2) What is the most significant predictor for a Heart disease?
-3) Is their a correlation between Age and Sex with the chances of having a heart disease?
+3) Is their a significant correlation between the feature variables that could predict chances of having a heart disease for a particular individual?
 4) Is there a possibility that based on the analysis of the vital data if we could prevent a possible heart failure from happening?
-5) 
+5) How far can it be predicted that a heart disease is possible based on the cholesterol, blood pressure
 
 ## Approach
 I am planning to use Logistic Regression algorithm using glm and random forest in order to do a comparison to the output. The random forest algorithm works by aggregating the predictions made by multiple decision trees. I would be using bootstrapped dataset created from the original dataset.
