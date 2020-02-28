@@ -18,21 +18,27 @@ knitr::opts_chunk$set(echo = FALSE)
 World Health Organization has estimated 12 million deaths occur worldwide, every year due to Heart diseases. Half the deaths in the United States and other developed countries are due to cardio vascular diseases. The early prognosis of cardiovascular diseases can aid in making decisions on lifestyle changes in high risk patients and in turn reduce the complications. This analysis intends to pinpoint the most relevant/risk factors of heart disease as well as predict the overall risk using logistic regression and random forest algorithms.
 
 ## Research question
-We would like to do Exploratory Data Analysis on the data to get an understanding of the different features and how they are related to one another. We would also look at the variables and see if they are related to one another.As part of this exercise we are trying to build a classification problem to answer our main question about the chances of having a heart disease based on the various medical prognosis and tests.
+We would like to do Exploratory Data Analysis on the data to get an understanding of the different features and how they are related to one another. We would also look at the variables and see if they are related to one another.As part of this exercise we are trying to build a classification problem to answer our main question about the chances of having a heart disease based on the various medical prognosis and tests. The variables are self-explanatory and refer to the attributes of medical test of any normal person going for checkup and the response variable is ‘presence of heart disease’.
 
 1) What are the chances of having a heart disease based on the Vital data collected from a sample of patients of different age group and occupation?
 2) What is the most significant predictor for a Heart disease?
 3) Is their a significant correlation between the feature variables that could predict chances of having a heart disease for a particular individual?
 4) Is there a possibility that based on the analysis of the vital data if we could prevent a possible heart failure from happening?
-5) How far can it be predicted that a heart disease is possible based on the cholesterol, blood pressure
+5) How far can it be predicted that a heart disease is possible based on the cholesterol, blood pressure and age?
 
 ## Approach
+The approach I took to analyze the various data sets consists of looking at each of the different datasets obtained from the different geographic locations. The dataset was curtailed into a smaller set using 14 out of the total 76 attributes for this analysis. Then after cleaning all the datasets and looking for missing values it was finally decided to go with the most accurate dataset which was from Cleveland.  
 I am planning to use Logistic Regression algorithm using glm and random forest in order to do a comparison to the output. The random forest algorithm works by aggregating the predictions made by multiple decision trees. I would be using bootstrapped dataset created from the original dataset.
 
 ## How my approach addresses (fully or partially) the problem
-When the random forest is used for classification and is presented with a new sample, the final prediction is made by taking the majority of the predictions made by each individual decision tree in the forest. In the event, it is used for regression and it is presented with a new sample, the final prediction is made by taking the average of the predictions made by each individual decision tree in the forest.
+When the random forest is used for classification and is presented with a new sample, the final prediction is made by taking the majority of the predictions made by each individual decision tree in the forest. In the event, it is used for regression and it is presented with a new sample, the final prediction is made by taking the average of the predictions made by each individual decision tree in the forest. The final approach to organize the dataset is to get answers to the following questions.
 
-## Data
+1) What is the distribution of the data for the important features?
+2) How does the features have there values normalized or do they have biases?
+3) Is there any collinearity between the variables/features?
+4) What are most important features from the list of all the features available in the dataset?
+
+## Describing the Data and the methodology used for the research.
 I have looked into various sources for this dataset that could be helpful in predicting the possible heart failure for an individual based on patient data that are collected for each of the patients on a regular checkup.
 Finally the below dataset was found to be most suitable. It was available in kaggle also.
 
@@ -51,38 +57,8 @@ This dataset integrates all the databases present in Heart Disease Dataset avail
        4. V.A. Medical Center, Long Beach and Cleveland Clinic Foundation:
 	  Robert Detrano, M.D., Ph.D.
 
-## Required Packages
 
-I am planning to use the following packages to start with and some more might be needed as I start the work:
-package : tidyr
-package : dplyr
-package : ggplot2
-package : broom
-package : randomForest
-package : caTools
-
-## Plots and Table
-
-Tables:
-Showing the first few rwos of the data set
-
-Plot:
-scatter plot showing the distribution of the important features
-3-d plot if needed for the data
-histogram
-
-
-## Questions for future steps
-
-As a starting point I would like to answer the following questions:
-1) What is the distribution of the data for the important features?
-2) How does the features have there values normalized or do they have biases?
-3) Is there any collinearity between the variables/features?
-4) What are most imporatnt features from the list of all the features available in the dataset?
-
-# Section 2 (Week 10)
-
-Loading the required libraries.
+Loading the initial required libraries.
 
 ```{r , echo=TRUE, results='hide', message=FALSE, warning=FALSE}
 library(tidyr)
@@ -574,12 +550,23 @@ cm_glm
 
 
 ```
+Since this is a classification problem, we use a confusion matrix to evaluate the performance of our model. Recall that values on the diagonal correspond to true positives and true negatives (correct predictions) whereas the others correspond to false positives and false negatives.
 Looking at the confusion matrix it looks like the predictions that I am getting from both the models are on the high accuracy (> 80%).
-But I am planning to look into more details into the outputs and comparing the different values of Sensitivity and specificity for both the models.
 
- ### Points to be noted for Final submission..
- 
- #### Describe the categorical variables: The variables are self-explanatory and refer to the attributes of cars and the response variable is ‘Car Acceptability’. All the variables are categorical in nature and have 3-4 factor levels in each.
- 
- ##### Find the correlation between, age,cholesterol, weight and Gender also.
- 
+Analysis of the 2 models based on the confusion matrix data. Looking at the information from the confusion matrix we can interpret the quality of the classifier.
+In Total the Test Set had 59 observations while the training set had 238 observations.
+The Accuracy is the proportion of the cases that were classified correctly. 
+So we can see that for the random forest model (28+23)=51 times out of 59 it was able to predict correctly. Which is 86.44%
+For the Logistic Regression that number is (25+25) = 50 out of 59 which is 84.75%
+Also for the both the models the accuracy is more than the No Information Rate and which is about 54% and that is good for any model.
+
+Recall is calculated by out of all the positive cases, how much was predicted correctly. 
+In our case the random forest has a Recall of 87.5% i.e., 28 out of 32
+For the Logistic regression that value is 78.12% 25 out of 32.
+
+Precision is out of all the positive cases we have predicted correctly, how many are actually positive.
+In our case the random forest has a precision is 85.19% which is 28 out of 32.
+For the Logistic regression that value is 92.59% which is 25 out of 27
+
+So I can conclude that overall the random forest was a better fit than the logictic regression model.
+
