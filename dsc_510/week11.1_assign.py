@@ -42,7 +42,7 @@ The below function takes in the user response and checks if the user response is
 def is_numeric(n):
     try:
         float(n)  # type-casting the string to 'float',if string is not a valid float or integer it will
-        # raise value error
+                  # raise value error
     except ValueError:
         return False  # the user input is alpha
     return True
@@ -69,15 +69,16 @@ def main():
             "your cart \n"
             "Price :")
     else:
-        # user_response = input(
-        #     "Please enter the price to add an item to your cart, or "'exit'" to exit. "'empty'"will clear "
-        #     "your cart")
+        # this part will be executed if the user response is not numeric.
         if user_response == 'exit':
             print("Please proceed to check out")
         elif user_response == '':
             cr.clear()
             print("Good bye!")
             print("Your shopping cart is cleared. Please start again.")
+        else:
+            cr.clear()
+            print("Please enter a valid input.")
 
     print(" You have " + str(cr.getCount()) + " items in total.")
     print(" Your Total Price is: ", locale.currency(cr.getTotal()))
