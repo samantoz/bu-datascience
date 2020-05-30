@@ -89,7 +89,9 @@ def process_api(inp, opt):
         response.raise_for_status()
         print('Connection Successful!')
         pretty_print(response.json())
-    except (ValueError, Exception):
+    except EnvironmentError:
+        print('Connection not successful. Check url! ' + final_url)
+    except ValueError:
         print('User Input :' + inp + ' not found. Please try again !')
 
 
