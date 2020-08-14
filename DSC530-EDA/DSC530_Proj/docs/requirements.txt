@@ -1,0 +1,30 @@
+A minimum of 5 variables in your dataset used during your analysis (for help with selecting, the author made his selection on page 6 of your book). Consider what you think could have an impact on your question – remember this is never perfect, so don’t be worried if you miss one (Chapter 1).
+Describe what the 5 variables mean in the dataset (Chapter 1).
+Include a histogram of each of the 5 variables – in your summary and analysis, identify any outliers and explain the reasoning for them being outliers and how you believe they should be handled (Chapter 2).
+Include the other descriptive characteristics about the variables: Mean, Mode, Spread, and Tails (Chapter 2).
+Using pg. 29 of your text as an example, compare two scenarios in your data using a PMF. Reminder, this isn’t comparing two variables against each other – it is the same variable, but a different scenario. Almost like a filter. The example in the book is first babies compared to all other babies, it is still the same variable, but breaking the data out based on criteria we are exploring (Chapter 3).
+Create 1 CDF with one of your variables, using page 41-44 as your guide, what does this tell you about your variable and how does it address the question you are trying to answer (Chapter 4).
+Plot 1 analytical distribution and provide your analysis on how it applies to the dataset you have chosen (Chapter 5).
+Create two scatter plots comparing two variables and provide your analysis on correlation and causation. Remember, covariance, Pearson’s correlation, and Non-Linear Relationships should also be considered during your analysis (Chapter 7).
+Conduct a test on your hypothesis using one of the methods covered in Chapter 9.
+For this project, conduct a regression analysis on either one dependent and one explanatory variable, or multiple explanatory variables (Chapter 10 & 11).Steps
+
+Steps for the project with milestones
+=====================
+Milestone 1: Evaluate Datasets, start thinking of statistical questions.
+Milestone 2: Select a dataset, solidify your statistical question, begin describing the single variables in your dataset to determine which variables are relevant to your question (Distributions, PMFs, CDFs).  
+Milestone 3 (Weeks 4-5): Start identifying relationships between the variables you have identified vs looking at just one variable at a time.
+Milestone 4 (Weeks 6-8) – Start evaluating if the results you are seeing in a sample would happen in the large population and start testing out the results and hypothesis you have made up to this point.
+Milestone 5 (Weeks 9-10) – Wrap up your PowerPoint presentation and summarization of analysis.
+
+
+File_Type:        The value “Active” means that the particular product needs investigation
+SoldFlag:         The value 1 = sale, 0 = no sale in past six months
+SKU_number:       This is the unique identifier for each product.
+Order:            Just a sequential counter. Can be ignored.
+SoldFlag:         1 = sold in past 6 mos. 0 = Not sold
+MarketingType:    Two categories of how we market the product.
+New_Release_Flag: Any product that has had a future release (i.e., Release Number > 1)
+
+Your code or screenshots of your code
+
